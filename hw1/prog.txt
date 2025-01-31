@@ -57,10 +57,10 @@ add Bop1 Nop2 rst
 # Instead of 'gt', we test bit7. If (rst & 0x80) != 0 => negative => add 100
 # We test bit 7 because in two's complement representation, bit 7 is the sign bit (1=negative, 0=positive)
 ldi 0x80 r13
-and rst r13 r14   ; if rst is negative, r14=0x80; else 0
-if r14            ; skip next if r14 == 0 (i.e. if positive)
+and rst r13 r14   
+if r14           
 ldi 0x64 r6
-if r14            ; skip next if r14 == 0 (i.e. if positive)
+if r14            
 add rst r6 rst
 
 # Now do the repeated subtraction loop to convert 'rst' to BCD
