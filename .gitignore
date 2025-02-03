@@ -1,3 +1,18 @@
 Programs/*
 !Programs/README.md
 Examples/build/*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp

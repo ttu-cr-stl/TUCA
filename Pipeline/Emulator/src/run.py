@@ -79,31 +79,20 @@ def write_results(memory: dict, output_file: Path):
         for addr, value in sorted(memory.items()):
             f.write(f"0x{addr:02x}=0x{value:02x}\n")
 
-<<<<<<< HEAD
-def print_memory_map(memory: dict, expected_memory: dict = None):
-    """Print the final memory map in a readable format"""
-=======
 def print_memory_map(memory: dict, expected_memory: dict = None, instruction_count: int = None):
     """Print the final memory map in a readable format"""
     if instruction_count is not None:
         print(f"\nProgram completed in {instruction_count} cycles")
         
->>>>>>> b8a8cea (improve emu cmd and output)
     print("\nFinal Memory Map:")
     print("----------------")
     if expected_memory:
         print("Address: Actual -> Expected")
-<<<<<<< HEAD
-        # Show all non-zero memory locations
-        all_addresses = sorted(set(addr for addr, val in memory.items() if val != 0))
-        for addr in all_addresses:
-            actual = memory.get(addr, 0)
-=======
-        # Show all memory locations that were written to
-        all_addresses = sorted(memory.keys())
-        for addr in all_addresses:
-            actual = memory[addr]
->>>>>>> b8a8cea (improve emu cmd and output)
+        # Show all memory locations between min and max used addresses
+        min_addr = min(memory.keys())
+        max_addr = max(memory.keys())
+        for addr in range(min_addr, max_addr + 1):
+            actual = memory.get(addr, 0)  # Get value or 0 if not written
             # Only show expected if it's specified in config
             if addr in expected_memory:
                 expected = expected_memory[addr]
@@ -115,12 +104,7 @@ def print_memory_map(memory: dict, expected_memory: dict = None, instruction_cou
     else:
         # Original format when no expected values
         for addr, value in sorted(memory.items()):
-<<<<<<< HEAD
-            if value != 0:  # Only show non-zero values
-                print(f"0x{addr:02x}: 0x{value:02x}")
-=======
             print(f"0x{addr:02x}: 0x{value:02x}")
->>>>>>> b8a8cea (improve emu cmd and output)
     print("----------------")
 
 def main():
@@ -186,11 +170,7 @@ def main():
                 }
                 
                 # Show memory map and save results
-<<<<<<< HEAD
-                print_memory_map(final_state.memory, expected_memory)
-=======
                 print_memory_map(final_state.memory, expected_memory, final_state.instruction_count)
->>>>>>> b8a8cea (improve emu cmd and output)
                 write_results(final_state.memory, output_file)
                 
                 if not verify_results(output_file, test_case['expected']):
@@ -247,11 +227,7 @@ def main():
                 sys.exit(1)
             
             # Always show the final memory map with expected values if available
-<<<<<<< HEAD
-            print_memory_map(final_state.memory, expected_memory)
-=======
             print_memory_map(final_state.memory, expected_memory, final_state.instruction_count)
->>>>>>> b8a8cea (improve emu cmd and output)
             
             # Save results if output file specified
             if output_file:
