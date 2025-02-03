@@ -88,10 +88,21 @@ def print_memory_map(memory: dict, expected_memory: dict = None, instruction_cou
     print("----------------")
     if expected_memory:
         print("Address: Actual -> Expected")
-        # Show all memory locations between min and max used addresses
-        min_addr = min(memory.keys())
-        max_addr = max(memory.keys())
-        for addr in range(min_addr, max_addr + 1):
+        # Show continuous range of used addresses and any expected values
+        used_addrs = list(memory.keys())
+        if used_addrs:  # If memory was written to
+            min_addr = min(used_addrs)
+            max_addr = max(used_addrs)
+            all_addresses = set(range(min_addr, max_addr + 1))  # Continuous range
+        else:
+            all_addresses = set()
+            
+        # Add any addresses with expected values
+        if expected_memory:
+            all_addresses.update(expected_memory.keys())
+            
+        # Print all addresses in order
+        for addr in sorted(all_addresses):
             actual = memory.get(addr, 0)  # Get value or 0 if not written
             # Only show expected if it's specified in config
             if addr in expected_memory:
