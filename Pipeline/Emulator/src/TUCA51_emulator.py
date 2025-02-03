@@ -93,10 +93,22 @@ class TUCAEmulator:
                     if not line or line.startswith('#'):
                         continue
                     try:
-                        value = int(line.replace('0x', ''), 16)
+                        # Check if value is in binary format (all 1s and 0s)
+                        if all(c in '01' for c in line):
+                            value = int(line, 2)
+                        # Check if value is in hex format with 0x prefix
+                        elif line.startswith('0x'):
+                            value = int(line, 16)
+                        else:
+                            raise ValueError(f"Memory values must be either binary (1s and 0s) or hex with 0x prefix")
+                        
+                        if value > 255:
+                            raise ValueError(f"Memory value {value} exceeds 8 bits")
+                            
                         self.mem[idx] = value
-                    except ValueError:
+                    except ValueError as e:
                         print(f"Warning: Invalid memory value on line {idx+1}: {line}")
+                        print(f"Error: {str(e)}")
                         continue
                 return True
 
