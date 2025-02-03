@@ -1,6 +1,6 @@
 # TUCA (TTU Computer Architecture)
 
-TUCA is a computer architecture developed at Texas Tech University - Costa Rica for educational purposes. This repository contains the assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
+TUCA is a computer architecture developed at Texas Tech University - Costa Rica for educational purposes by Dr. Juan Carlos Rojas. This repository contains the assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
 
 ## Setup
 
