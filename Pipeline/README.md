@@ -50,5 +50,5 @@ Each component has its own build and test infrastructure. See the individual com
 The components work together in the TUCA toolchain:
 
 1. Assembler converts programs to machine code
-2. Both Emulator and Processor execute the same machine code
+2. Processor executes machine code while Emulator directly interprets assembly code
 3. Results are compared to verify correctness
