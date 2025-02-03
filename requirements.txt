@@ -1,0 +1,6 @@
+# Core dependencies
+pathlib>=1.0.1
+
+# Testing and development
+pytest>=7.0.0
+pytest-cov>=4.0.0 

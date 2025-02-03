@@ -2,6 +2,106 @@
 
 TUCA is a computer architecture developed at Texas Tech University for educational purposes. This repository contains the assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
 
+## Setup
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Git
+- Operating System:
+  - Linux/macOS: Any recent version
+  - Windows: Windows 10/11 with either:
+    - Windows Subsystem for Linux (WSL) - Recommended
+    - Native Windows (using `tuca.bat`)
+
+### Installation
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/yourusername/TUCA.git
+   cd TUCA
+   ```
+
+2. **Set Up Python Environment**:
+
+   ```bash
+   # Create a virtual environment
+   python -m venv venv
+
+   # Activate it (choose one based on your system):
+   source venv/bin/activate     # Linux/macOS
+   .\venv\Scripts\activate      # Windows CMD
+   .\venv\Scripts\Activate.ps1  # Windows PowerShell
+
+   # Install dependencies
+   pip install -r requirements.txt
+   ```
+
+3. **Configure the Tool**:
+
+   On Linux/macOS:
+
+   ```bash
+   # Make the tuca script executable
+   chmod +x scripts/tuca
+
+   # Test the installation
+   ./scripts/tuca --help
+   ```
+
+   On Windows:
+
+   ```cmd
+   # Test the installation (CMD or PowerShell)
+   scripts\tuca.bat --help
+   ```
+
+4. **Optional: Add to PATH**:
+
+   To run the `tuca` command from any directory:
+
+   On Linux/macOS:
+
+   ```bash
+   # Add to your ~/.bashrc, ~/.zshrc, or equivalent
+   export PATH="/absolute/path/to/TUCA/scripts:$PATH"
+   source ~/.bashrc  # or ~/.zshrc
+   ```
+
+   On Windows:
+
+   ```cmd
+   # Add to your system environment variables:
+   # Control Panel > System > Advanced System Settings > Environment Variables
+   # Add the full path to TUCA\scripts to your PATH
+   # Or from PowerShell:
+   $env:Path += ";C:\path\to\TUCA\scripts"
+   ```
+
+### Verifying Installation
+
+After installation, you should be able to:
+
+1. Run the help command:
+   ```bash
+   ./scripts/tuca --help      # Linux/macOS
+   scripts\tuca.bat --help    # Windows
+   # Or if added to PATH:
+   tuca --help               # Linux/macOS
+   tuca.bat --help          # Windows
+   ```
+2. See the list of available commands
+3. Access the example programs in the `Programs` directory
+
+If you encounter any issues, please check:
+
+- Python version: `python --version`
+- Virtual environment is activated (you should see `(venv)` in your prompt)
+- All dependencies are installed: `pip list`
+- On Windows, ensure you're using the correct script (`tuca.bat`)
+- On Linux/macOS, ensure `scripts/tuca` has execute permissions
+
 ## Project Structure
 
 ```
@@ -42,18 +142,36 @@ TUCA/
 
 1. **Create a New Program**:
 
-   ```bash
-   # Create program directory
-   mkdir -p Programs/example1/test_mems
+   Create a new directory for your program with this structure:
 
-   # Write your assembly program
-   vim Programs/example1/prog.txt
-
-   # Create test memory files
-   vim Programs/example1/test_mems/test1.txt
+   ```
+   Programs/
+   └── example1/           # Your program directory
+       ├── prog.txt        # Your assembly program
+       ├── config.json     # Test configuration
+       └── test_mems/      # Test memory files
+           └── test1.txt   # Initial memory state
    ```
 
-2. **Configure Tests**:
+   You can create this structure:
+
+   - Using your file explorer
+   - Using command line:
+
+     ```bash
+     # Linux/macOS
+     mkdir -p Programs/example1/test_mems
+
+     # Windows (CMD)
+     mkdir Programs\example1\test_mems
+     ```
+
+2. **Write Your Program**:
+
+   Create `Programs/example1/prog.txt` using any text editor and write your TUCA assembly code.
+
+3. **Configure Tests**:
+
    Create `Programs/example1/config.json`:
 
    ```json
@@ -73,18 +191,28 @@ TUCA/
    }
    ```
 
-3. **Build and Test**:
+4. **Build and Test**:
+
+   Linux/macOS:
 
    ```bash
-   # Build program
+   ./scripts/tuca build example1
+   ./scripts/tuca emu example1 test1
+   ```
+
+   Windows:
+
+   ```cmd
+   scripts\tuca.bat build example1
+   scripts\tuca.bat emu example1 test1
+   ```
+
+   Or if `tuca` is in your PATH:
+
+   ```bash
    tuca build example1
-
-   # Run emulator tests
-   tuca emu example1 test1     # Run single test
-   tuca emu example1 all       # Run all tests
-
-   # Verify against Verilog
-   tuca verify example1 test1
+   tuca emu example1 test1     # Linux/macOS
+   tuca.bat emu example1 test1 # Windows
    ```
 
 ## Build System
@@ -93,39 +221,81 @@ The `tuca` command provides a unified interface for all development tasks:
 
 ### Building Programs
 
+Linux/macOS:
+
 ```bash
-tuca build example1          # Build program
+./scripts/tuca build example1          # Build program
+# Or if in PATH:
+tuca build example1
+```
+
+Windows:
+
+```cmd
+scripts\tuca.bat build example1
+# Or if in PATH:
+tuca.bat build example1
 ```
 
 ### Running Tests
 
+Linux/macOS:
+
 ```bash
-tuca emu example1 test1      # Run specific test
-tuca emu example1 all        # Run all tests
+./scripts/tuca emu example1 test1      # Run specific test (minimal output)
+./scripts/tuca emu example1 test1 --verbose  # Show detailed execution trace
+./scripts/tuca emu example1 all        # Run all tests
 ```
 
-The emulator supports two operating modes:
+Windows:
 
-1. **Interactive Mode** (Default):
+```cmd
+scripts\tuca.bat emu example1 test1
+scripts\tuca.bat emu example1 test1 --verbose
+scripts\tuca.bat emu example1 all
+```
 
-   - Shows full instruction execution details
+The emulator has two operating modes:
+
+1. **Minimal Mode** (Default):
+
+   - Only shows final memory state
+   - Shows verification result (✅ or ❌)
+   - Perfect for automated testing
+
+2. **Verbose Mode** (with --verbose):
+   - Shows full instruction execution trace
+   - Displays register state after each instruction
    - Perfect for debugging and understanding program flow
-
-2. **Minimal Mode** (Test Mode):
-   - Only shows final memory state and verification results
-   - Used automatically when running tests
 
 ### Verifying Results
 
+Linux/macOS:
+
 ```bash
-tuca verify example1 test1   # Compare emulator vs Verilog
+./scripts/tuca verify example1 test1   # Compare emulator vs Verilog
+```
+
+Windows:
+
+```cmd
+scripts\tuca.bat verify example1 test1
 ```
 
 ### Cleaning Build Artifacts
 
+Linux/macOS:
+
 ```bash
-tuca clean              # Clean all
-tuca clean example1     # Clean specific program
+./scripts/tuca clean              # Clean all
+./scripts/tuca clean example1     # Clean specific program
+```
+
+Windows:
+
+```cmd
+scripts\tuca.bat clean
+scripts\tuca.bat clean example1
 ```
 
 ## Test Results

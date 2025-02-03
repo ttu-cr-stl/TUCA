@@ -68,11 +68,12 @@ def write_results(memory: dict, output_file: Path):
             f.write(f"0x{addr:02x}=0x{value:02x}\n")
 
 def main():
-    if len(sys.argv) < 3 or len(sys.argv) > 4:
-        print("Usage: python3 run.py <program.txt> <memory.txt> [output_file]")
+    if len(sys.argv) < 3:
+        print("Usage: python3 run.py <program.txt> <memory.txt> [output_file] [--verbose]")
         print("Examples:")
         print("  python3 run.py Programs/example1/prog.txt Programs/example1/test_mems/mem1.txt")
         print("  python3 run.py Programs/example1/prog.txt Programs/example1/test_mems/mem1.txt Programs/example1/results/emulator/mem1.txt")
+        print("  python3 run.py Programs/example1/prog.txt Programs/example1/test_mems/mem1.txt Programs/example1/results/emulator/mem1.txt --verbose")
         sys.exit(1)
     
     # Get root directory (where the Programs directory is)
@@ -84,16 +85,18 @@ def main():
     
     # Optional output file
     output_file = None
-    if len(sys.argv) == 4:
+    if len(sys.argv) > 3 and not sys.argv[3].startswith('--'):
         output_file = Path(sys.argv[3])
     
+    # Check for verbose flag
+    verbose = '--verbose' in sys.argv
+    
     # Run the program through emulator
-    # Use minimal mode when writing to output file (likely running as part of test)
-    minimal_mode = output_file is not None
-    emulator = TUCAEmulator(verbose=not minimal_mode, minimal=minimal_mode)
+    # Default to minimal mode unless verbose flag is set
+    emulator = TUCAEmulator(verbose=verbose, minimal=not verbose)
     
     try:
-        if not minimal_mode:
+        if verbose:
             print(f"\nRunning emulator with memory file: {memory_file}")
             if output_file:
                 print(f"Results will be saved to: {output_file}")
@@ -110,7 +113,7 @@ def main():
         # Save results if output file specified
         if output_file:
             write_results(final_state.memory, output_file)
-            if not minimal_mode:
+            if verbose:
                 print(f"\nResults written to: {output_file}")
             
             # If this is a test case, verify against expected output
@@ -126,7 +129,7 @@ def main():
                         None
                     )
                     if test_case:
-                        if not minimal_mode:
+                        if verbose:
                             print("\nVerifying results...")
                         if verify_results(output_file, test_case['expected']):
                             print("✅ Results match expected values")

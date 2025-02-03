@@ -18,10 +18,13 @@ usage() {
     echo "    <test> can be either:"
     echo "      - test name: Run specific test (e.g., mem1)"
     echo "      - 'all': Run all tests in test_mems/"
+    echo "    Options:"
+    echo "      --verbose: Show detailed execution trace"
     echo "    Results saved to results/emulator/<test>.txt"
     echo "    Examples:"
-    echo "      tuca emu example1 mem1  # Run example1/prog.txt with mem1.txt"
-    echo "      tuca emu example1 all   # Run example1/prog.txt with all tests"
+    echo "      tuca emu example1 mem1         # Run with minimal output"
+    echo "      tuca emu example1 mem1 --verbose  # Show execution trace"
+    echo "      tuca emu example1 all          # Run all tests"
     echo
     echo "  build <program>       Build a TUCA program"
     echo "    Example: tuca build example1"
@@ -52,6 +55,7 @@ get_results_dir() {
 run_emulator() {
     local prog_file="$1"
     local mem_file="$2"
+    local verbose="$3"
     local test_name=$(get_test_name "$mem_file")
     local prog_dir=$(dirname "$prog_file")
     local results_dir=$(get_results_dir "$prog_dir")
@@ -69,7 +73,11 @@ run_emulator() {
     prog_abs_path="$ROOT_DIR/$prog_file"
     mem_abs_path="$ROOT_DIR/$mem_file"
     
-    ./Pipeline/Emulator/src/run.py "$prog_abs_path" "$mem_abs_path" "$output_file"
+    if [ "$verbose" = "true" ]; then
+        ./Pipeline/Emulator/src/run.py "$prog_abs_path" "$mem_abs_path" "$output_file" --verbose
+    else
+        ./Pipeline/Emulator/src/run.py "$prog_abs_path" "$mem_abs_path" "$output_file"
+    fi
     local status=$?
     echo "----------------------------------------"
     return $status
@@ -77,13 +85,19 @@ run_emulator() {
 
 case "$1" in
     "emu")
-        if [ $# -ne 3 ]; then
+        if [ $# -lt 3 ]; then
             echo "Error: emu command requires program and test name"
-            echo "Usage: tuca emu <program> <test or all>"
+            echo "Usage: tuca emu <program> <test or all> [--verbose]"
             exit 1
         fi
         program_dir="$2"
         test_name="$3"
+        verbose=false
+        
+        # Check for verbose flag
+        if [ "$4" = "--verbose" ]; then
+            verbose=true
+        fi
         
         # Setup paths
         prog_dir="Programs/$program_dir"
@@ -117,7 +131,7 @@ case "$1" in
             # Find all .txt files and sort them
             while IFS= read -r mem_file; do
                 found_files=true
-                run_emulator "$prog_file" "$mem_file" || success=false
+                run_emulator "$prog_file" "$mem_file" "$verbose" || success=false
             done < <(find "$test_mems_dir" -name "*.txt" | sort)
             
             if [ "$found_files" = false ]; then
@@ -133,7 +147,7 @@ case "$1" in
                 echo "Error: Test file $mem_file not found"
                 exit 1
             fi
-            run_emulator "$prog_file" "$mem_file" || exit 1
+            run_emulator "$prog_file" "$mem_file" "$verbose" || exit 1
         fi
         ;;
     "build")
