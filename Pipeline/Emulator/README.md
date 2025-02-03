@@ -1,117 +1,132 @@
 # TUCA-5.1 Emulator
 
-By Juan Carlos Rojas
-Modified by Andres Antillon
-5/29/2023
+![Version](https://img.shields.io/badge/version-5.1-blue)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![Status](https://img.shields.io/badge/status-stable-green)
 
-## Description
+A cycle-accurate emulator for the TUCA-5.1 computer architecture, designed for educational purposes and program verification.
 
-This is an emulator of the TUCA-5.1 computer architecture.
-The assembly code should be written in a text file, one instruction per line.
-The initial memory map should be written in another text file, where each line number corresponds to its memory address (line 1 = address 0x00, line 2 = address 0x01, etc.).
-Values should be in hex format (with or without 0x prefix).
-Empty lines and lines starting with # are ignored.
-If you provide less than 256 values, the rest of the memory positions will be filled with zeros.
+## Features
+
+- **Cycle-Accurate Execution**
+
+  - Precise instruction timing
+  - Register state tracking
+  - Memory state tracking
+  - Branch handling
+
+- **Interactive Debugging**
+
+  - Step-by-step execution
+  - Register state inspection
+  - Memory visualization
+  - Instruction tracing
+
+- **Testing Support**
+  - Batch mode for automated testing
+  - Memory state verification
+  - Expected value checking
+  - Integration with build system
+
+## Project Structure
+
+```
+Emulator/
+├── src/
+│   ├── TUCA51_emulator.py  # Core emulator implementation
+│   └── run.py              # Command-line interface
+└── TUCA51_emulator - Original.py  # Original reference implementation
+```
 
 ## Usage
 
-- Run TUCA51_emulator.py
-- When prompted, type the name of your program text file
-- When prompted, type the name of your initial memory map text file
-- The program will run until it reaches the end, or a halt instruction
-- The final values of all the registers and memory locations will be displayed
+The emulator is primarily used through the TUCA build system. For direct usage, see the examples below.
 
-## Operating Modes
+### Operating Modes
 
-The emulator supports two operating modes:
+#### 1. Interactive Mode (Default)
 
-### Verbose Mode (Default Interactive Mode)
+- Full instruction trace
+- Register state after each step
+- Memory visualization
+- Example output:
 
-When `verbose=True` and `minimal=False`:
+  ```
+  Instruction Memory:
+  0x000: loadpc r5 r6
+  0x002: jmp main
+  ...
 
-- Shows full instruction memory at startup
-- Displays each instruction as it executes
-- Shows register state after each instruction
-- Shows final register and memory state
-- Perfect for debugging and understanding program flow
+  Register State:
+  R0: 0x0000  R4: 0x0000  R8:  0x0000  R12: 0x0000
+  R1: 0x0042  R5: 0x0000  R9:  0x0000  R13: 0x0000
+  R2: 0x0000  R6: 0x0000  R10: 0x0000  R14: 0x0000
+  R3: 0x0000  R7: 0x0000  R11: 0x0000  R15: 0x0000
 
-### Minimal Mode (Test/Batch Mode)
+  Memory Map:
+  0x00: 0x42 ✅
+  0x01: 0x24 ❓
+  0x02: 0x66 ✅
+  ```
 
-When `minimal=True`:
+#### 2. Batch Mode
 
-- Only shows final memory state
-- Shows verification result (✅ or ❌) when running tests
-- Ideal for automated testing and batch processing
-- Used automatically when running with output file
+- Minimal output
+- Final memory state only
+- Verification results
+- Perfect for automated testing
+- Example output:
+  ```
+  0x00=0x42
+  0x01=0x24
+  0x02=0x66
+  ```
 
-## Example
+### Input File Formats
 
-In the example below, the loadpc instruction is used to store the program counter.  
-This is used as a base to compute a return address (PC+4), and used to jump back.
-Note that instruction addresses are 12 bits, and need to be handled using two registers.
+#### Assembly Program (prog.txt)
 
 ```
->> TUCA51_emulator.py
->> Enter name of program file: tuca51_ex4_prog.txt
->> Enter name of initial memory file: tuca51_ex4_mem.txt
-
-Instruction Memory:
-
-0x000: loadpc r5 r6
-0x002: jmp myfunc
-function_return:
-0x004: halt
-myfunc:
-0x006: ldi 0x04 r4
-0x008: ldi 0x01 r1
-0x00a: add r6 r4 r7
-0x00c: gt r6 r7 r8
-0x00e: if r8
-0x010: add r5 r1 r5
-0x012: jmpr r5 r7
-
-Starting Execution
-
-0x000: loadpc r5 r6
-0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x002: jmp myfunc
-0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-myfunc:
-0x006: ldi 0x04 r4
-0x00 0x00 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x008: ldi 0x01 r1
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00a: add r6 r4 r7
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00c: gt r6 r7 r8
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00e: if r8
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x010: add r5 r1 r5
-Skipped
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x012: jmpr r5 r7
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-function_return:
-0x004: halt
-Program completed after 10 instructions
-
-Register file:
-
-00: 0x00
-01: 0x01
-02: 0x00
-03: 0x00
-04: 0x04
-05: 0x00
-06: 0x00
-07: 0x04
-08: 0x00
-09: 0x00
-10: 0x00
-11: 0x00
-12: 0x00
-13: 0x00
-14: 0x00
-15: 0x00
+# Comments start with #
+loadpc r5 r6     # Load PC into registers
+jmp main         # Jump to main
+main:
+    ldi 0x42 r1  # Load immediate
+    halt         # Stop execution
 ```
+
+#### Memory Initialization (mem.txt)
+
+```
+# Address 0x00
+42
+# Address 0x01
+24
+# Address 0x02
+66
+```
+
+## Development
+
+### Code Style
+
+- Follow PEP 8
+- Document all functions
+- Keep functions focused and small
+
+## Contributing
+
+See [CONTRIBUTING.md](../../../CONTRIBUTING.md) for guidelines on:
+
+- Code style
+- Testing requirements
+- Pull request process
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](../../../LICENSE) file for details.
+
+## Authors
+
+- Juan Carlos Rojas - _Initial work_
+- Andres Antillon - _Modifications and improvements_

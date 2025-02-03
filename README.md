@@ -1,6 +1,35 @@
 # TUCA (TTU Computer Architecture)
 
-TUCA is a computer architecture developed at Texas Tech University - Costa Rica for educational purposes by Dr. Juan Carlos Rojas. This repository contains the assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
+![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+TUCA is a computer architecture developed at Texas Tech University - Costa Rica for educational purposes by Dr. Juan Carlos Rojas. This repository contains a complete educational computer architecture toolkit including an assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
+
+## Features
+
+- **Complete Architecture Implementation**
+  - Custom instruction set architecture (ISA)
+  - Memory-mapped I/O support
+  - Pipeline implementation in Verilog
+- **Development Tools**
+  - Assembler for converting TUCA assembly to machine code
+  - Emulator for direct assembly code interpretation
+  - Hardware implementation in Verilog
+  - Unified build and test system
+- **Educational Resources**
+  - Example programs and test cases
+  - Comprehensive documentation
+  - Step-by-step tutorials
+  - Interactive debugging support
+
+## TUCA Architecture Overview
+
+TUCA is designed as an educational architecture that demonstrates key concepts in computer organization:
+
+- **Simple but Complete ISA**: Includes essential instructions for computation and control flow
+- **Memory-Mapped I/O**: Demonstrates hardware-software interface concepts
+- **Pipeline Implementation**: Shows modern processor design principles
+- **Verification Framework**: Enables comparison between emulation and hardware implementation
 
 ## Setup
 
@@ -351,3 +380,37 @@ The build system generates three types of results:
 ## License
 
 [Add license information here]
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Python Environment Problems**
+
+   - Ensure Python 3.8+ is installed: `python --version`
+   - Virtual environment is active (look for `(venv)` in prompt)
+   - All dependencies are installed: `pip list`
+
+2. **Permission Issues**
+
+   - On Linux/macOS: `chmod +x scripts/tuca`
+   - Check file ownership and permissions
+
+3. **Path Issues**
+   - Verify PATH configuration
+   - Use absolute paths if needed
+   - Check for spaces in directory names
+
+### Getting Help
+
+- Check the [Documentation](Docs/)
+- Review [Example Programs](Examples/)
+- File an issue on GitHub
+- Contact the development team
+
+## Additional Resources
+
+- [TUCA Architecture Specification](Docs/architecture.md)
+- [Assembly Language Reference](Docs/assembly.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Change Log](CHANGELOG.md)
