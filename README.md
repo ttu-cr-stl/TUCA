@@ -65,7 +65,7 @@ TUCA/
          "memory": "test_mems/test1.txt",
          "expected": {
            "memory": {
-             "0x02": "result"
+             "0x02": "0x10"
            }
          }
        }
