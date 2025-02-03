@@ -1,92 +1,168 @@
-TUCA-5.1 emulator
-By Juan Carlos Rojas
-5/29/2023
+# TUCA (TTU Computer Architecture)
 
-Description:
+TUCA is a computer architecture developed at Texas Tech University for educational purposes. This repository contains the assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
 
-This is an emulator of the TUCA-5.1 computer architecture.
-The assembly code should be written in a text file, one instruction per line.
-The initial memory map should be written in another text file, one value per line, using 8-bit hex values.
-If you provide less than 256 values, the rest of the memory positions will be filled with zeros
+## Project Structure
 
-Usage:
+```
+TUCA/
+├── Pipeline/          # Core TUCA implementation
+│   ├── Assembler/    # Assembly to machine code
+│   │   └── src/      # Assembler source code
+│   ├── Emulator/     # Software implementation
+│   │   └── src/      # Emulator source code
+│   └── Processor/    # Hardware implementation
+│       ├── src/      # Verilog source files
+│       └── testbench/# Verilog testbenches
+├── Programs/          # Assembly programs and tests
+│   └── example1/     # Example program
+│       ├── prog.txt      # Assembly program
+│       ├── config.json   # Test configuration
+│       ├── test_mems/    # Test memory files
+│       │   ├── test1.txt
+│       │   └── test2.txt
+│       ├── build/        # Build artifacts
+│       │   └── prog.mem      # Compiled program
+│       └── results/      # Test results
+│           ├── emulator/     # Emulator results
+│           │   └── test1.txt
+│           ├── verilog/      # Verilog results
+│           │   └── test1.txt
+│           └── verify/       # Verification reports
+│               └── test1.txt
+├── Examples/         # Example programs
+├── Docs/            # Documentation
+└── scripts/         # Build and test tools
+    ├── build.py     # Build system
+    ├── verify.py    # Result verification
+    └── tuca         # Command-line interface
+```
 
-- Run TUCA51_emulator.py
-- When prompted, type the name of your program text file
-- When prompted, type the name of your initial memory map text file
-- The program will run until it reaches the end, or a halt instruction
-- The final values of all the registers and memory locations will be displayed
+## Quick Start
 
-Verbose mode:
+1. **Create a New Program**:
 
-You can set the variable verbose_mode = True in the emulator to run in verbose mode.  
-In this mode, the value of all the registers will be printed after every instruction.
+   ```bash
+   # Create program directory
+   mkdir -p Programs/example1/test_mems
 
-Example:
-In the example below, the loadpc instruction is used to store the program counter.  
-This is used as a base to compute a return address (PC+4), and used to jump back.
-Note that instruction addresses are 12 bits, and need to be handled using two registers.
+   # Write your assembly program
+   vim Programs/example1/prog.txt
 
-> > TUCA51_emulator.py
-> > Enter name of program file: tuca51_ex4_prog.txt
-> > Enter name of initial memory file: tuca51_ex4_mem.txt
+   # Create test memory files
+   vim Programs/example1/test_mems/test1.txt
+   ```
 
-Instruction Memory:
+2. **Configure Tests**:
+   Create `Programs/example1/config.json`:
 
-0x000: loadpc r5 r6
-0x002: jmp myfunc
-function_return:
-0x004: halt
-myfunc:
-0x006: ldi 0x04 r4
-0x008: ldi 0x01 r1
-0x00a: add r6 r4 r7
-0x00c: gt r6 r7 r8
-0x00e: if r8
-0x010: add r5 r1 r5
-0x012: jmpr r5 r7
+   ```json
+   {
+     "program": "prog.txt",
+     "test_cases": [
+       {
+         "name": "test1",
+         "memory": "test_mems/test1.txt",
+         "expected": {
+           "memory": {
+             "0x02": "result"
+           }
+         }
+       }
+     ]
+   }
+   ```
 
-Starting Execution
+3. **Build and Test**:
 
-0x000: loadpc r5 r6
-0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x002: jmp myfunc
-0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-myfunc:
-0x006: ldi 0x04 r4
-0x00 0x00 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x008: ldi 0x01 r1
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00a: add r6 r4 r7
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00c: gt r6 r7 r8
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00e: if r8
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x010: add r5 r1 r5
-Skipped
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x012: jmpr r5 r7
-0x00 0x01 0x00 0x00 0x04 0x00 0x00 0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-function_return:
-0x004: halt
-Program completed after 10 instructions
+   ```bash
+   # Build program
+   tuca build example1
 
-Register file:
+   # Run emulator tests
+   tuca emu example1 test1     # Run single test
+   tuca emu example1 all       # Run all tests
 
-00: 0x00
-01: 0x01
-02: 0x00
-03: 0x00
-04: 0x04
-05: 0x00
-06: 0x00
-07: 0x04
-08: 0x00
-09: 0x00
-10: 0x00
-11: 0x00
-12: 0x00
-13: 0x00
-14: 0x00
-15: 0x00
+   # Verify against Verilog
+   tuca verify example1 test1
+   ```
+
+## Build System
+
+The `tuca` command provides a unified interface for all development tasks:
+
+### Building Programs
+
+```bash
+tuca build example1          # Build program
+```
+
+### Running Tests
+
+```bash
+tuca emu example1 test1      # Run specific test
+tuca emu example1 all        # Run all tests
+```
+
+The emulator supports two operating modes:
+
+1. **Interactive Mode** (Default):
+
+   - Shows full instruction execution details
+   - Perfect for debugging and understanding program flow
+
+2. **Minimal Mode** (Test Mode):
+   - Only shows final memory state and verification results
+   - Used automatically when running tests
+
+### Verifying Results
+
+```bash
+tuca verify example1 test1   # Compare emulator vs Verilog
+```
+
+### Cleaning Build Artifacts
+
+```bash
+tuca clean              # Clean all
+tuca clean example1     # Clean specific program
+```
+
+## Test Results
+
+The build system generates three types of results:
+
+1. **Emulator Results** (`results/emulator/`):
+
+   - Output from running program through emulator
+   - Format: `0xAA=0xBB` (hex addresses and values)
+
+   ```
+   0x02=0x42  # memory[0x02] = 0x42
+   0x03=0xFF  # memory[0x03] = 0xFF
+   ```
+
+2. **Verilog Results** (`results/verilog/`):
+
+   - Output from Verilog simulation
+   - Same format as emulator for easy comparison
+
+3. **Verification Reports** (`results/verify/`):
+   - Detailed comparison of emulator vs Verilog
+   - Shows expected values from config.json
+   - Highlights any mismatches with ❌
+   - Shows ✅ when all values match
+
+## Documentation
+
+- [Assembler Documentation](Pipeline/Assembler/README.md)
+- [Emulator Documentation](Pipeline/Emulator/README.md)
+- [Processor Documentation](Pipeline/Processor/README.md)
+
+## Contributing
+
+[Add contribution guidelines here]
+
+## License
+
+[Add license information here]
