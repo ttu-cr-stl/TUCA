@@ -16,19 +16,31 @@ def load_config(config_file: Path) -> dict:
         return None
 
 def read_memory_file(memory_file: Path) -> dict:
-    """Read memory values from a file"""
+    """Read memory values from a file. Supports two formats:
+    1. addr=value format: '0x00=0x99'
+    2. Sequential values: '0x99' (address starts at 0 and increments)
+    """
     memory = {}
     try:
         with open(memory_file) as f:
+            addr = 0  # Start address for sequential format
             for line in f:
                 line = line.strip()
                 if not line or line.startswith('#'):
                     continue
-                addr, value = line.split('=')
-                # Remove 0x prefix if present
-                addr = int(addr.replace('0x', ''), 16)
-                value = int(value.replace('0x', ''), 16)
+                    
+                if '=' in line:
+                    # Format 1: addr=value
+                    addr_str, value_str = line.split('=')
+                    addr = int(addr_str.replace('0x', ''), 16)
+                    value = int(value_str.replace('0x', ''), 16)
+                else:
+                    # Format 2: sequential values
+                    value = int(line.replace('0x', ''), 16)
+                    
                 memory[addr] = value
+                addr += 1  # Increment address for next value
+                
         return memory
     except Exception as e:
         print(f"Error reading memory file {memory_file}: {e}")
@@ -67,16 +79,31 @@ def write_results(memory: dict, output_file: Path):
         for addr, value in sorted(memory.items()):
             f.write(f"0x{addr:02x}=0x{value:02x}\n")
 
+<<<<<<< HEAD
 def print_memory_map(memory: dict, expected_memory: dict = None):
     """Print the final memory map in a readable format"""
+=======
+def print_memory_map(memory: dict, expected_memory: dict = None, instruction_count: int = None):
+    """Print the final memory map in a readable format"""
+    if instruction_count is not None:
+        print(f"\nProgram completed in {instruction_count} cycles")
+        
+>>>>>>> b8a8cea (improve emu cmd and output)
     print("\nFinal Memory Map:")
     print("----------------")
     if expected_memory:
         print("Address: Actual -> Expected")
+<<<<<<< HEAD
         # Show all non-zero memory locations
         all_addresses = sorted(set(addr for addr, val in memory.items() if val != 0))
         for addr in all_addresses:
             actual = memory.get(addr, 0)
+=======
+        # Show all memory locations that were written to
+        all_addresses = sorted(memory.keys())
+        for addr in all_addresses:
+            actual = memory[addr]
+>>>>>>> b8a8cea (improve emu cmd and output)
             # Only show expected if it's specified in config
             if addr in expected_memory:
                 expected = expected_memory[addr]
@@ -88,8 +115,12 @@ def print_memory_map(memory: dict, expected_memory: dict = None):
     else:
         # Original format when no expected values
         for addr, value in sorted(memory.items()):
+<<<<<<< HEAD
             if value != 0:  # Only show non-zero values
                 print(f"0x{addr:02x}: 0x{value:02x}")
+=======
+            print(f"0x{addr:02x}: 0x{value:02x}")
+>>>>>>> b8a8cea (improve emu cmd and output)
     print("----------------")
 
 def main():
@@ -155,7 +186,11 @@ def main():
                 }
                 
                 # Show memory map and save results
+<<<<<<< HEAD
                 print_memory_map(final_state.memory, expected_memory)
+=======
+                print_memory_map(final_state.memory, expected_memory, final_state.instruction_count)
+>>>>>>> b8a8cea (improve emu cmd and output)
                 write_results(final_state.memory, output_file)
                 
                 if not verify_results(output_file, test_case['expected']):
@@ -212,7 +247,11 @@ def main():
                 sys.exit(1)
             
             # Always show the final memory map with expected values if available
+<<<<<<< HEAD
             print_memory_map(final_state.memory, expected_memory)
+=======
+            print_memory_map(final_state.memory, expected_memory, final_state.instruction_count)
+>>>>>>> b8a8cea (improve emu cmd and output)
             
             # Save results if output file specified
             if output_file:
