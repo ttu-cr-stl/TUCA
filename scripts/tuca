@@ -1,177 +1,93 @@
 #!/bin/bash
 
-# Get the directory where this script is located
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+# Get the directory containing this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# Change to root directory
-cd "$ROOT_DIR"
-
-usage() {
-    echo "TUCA Development Tools"
-    echo
-    echo "Usage: tuca <command> [args...]"
-    echo
+# Function to show usage
+show_usage() {
+    echo "Usage: tuca <command> [options]"
+    echo ""
     echo "Commands:"
-    echo "  emu <program> <test>  Run program through emulator"
-    echo "    <program>: Program directory name"
-    echo "    <test> can be either:"
-    echo "      - test name: Run specific test (e.g., mem1)"
-    echo "      - 'all': Run all tests in test_mems/"
-    echo "    Options:"
-    echo "      --verbose: Show detailed execution trace"
-    echo "    Results saved to results/emulator/<test>.txt"
-    echo "    Examples:"
-    echo "      tuca emu example1 mem1         # Run with minimal output"
-    echo "      tuca emu example1 mem1 --verbose  # Show execution trace"
-    echo "      tuca emu example1 all          # Run all tests"
-    echo
-    echo "  build <program>       Build a TUCA program"
-    echo "    Example: tuca build example1"
-    echo
-    echo "  verify <program> <test>  Verify Verilog against emulator"
-    echo "    Compares:"
-    echo "      results/emulator/<test>.txt"
-    echo "      results/verilog/<test>.txt"
-    echo "    Example: tuca verify example1 mem1"
-    echo
-    echo "  clean [program...]    Clean build artifacts"
-    echo "    Example: tuca clean              # Clean all"
-    echo "            tuca clean example1      # Clean specific program"
-    echo "            tuca clean p1 p2         # Clean multiple programs"
+    echo "  build <program>              Build program"
+    echo "  emu <program> [test]         Run emulator (all tests by default)"
+    echo "  verify <program> <test>      Compare emulator vs Verilog"
+    echo "  clean [program]              Clean build artifacts"
+    echo ""
+    echo "Options:"
+    echo "  --verbose                    Show detailed output"
+    echo ""
+    echo "Examples:"
+    echo "  tuca build hw2              # Build hw2 program"
+    echo "  tuca emu hw2                # Run all tests"
+    echo "  tuca emu hw2 mem1           # Run specific test"
+    echo "  tuca verify hw2 mem1        # Compare results"
+    echo "  tuca clean                  # Clean all"
+    exit 1
 }
 
-get_test_name() {
-    local mem_file="$1"
-    # Extract filename without extension
-    basename "${mem_file%.*}"
-}
+# Check for minimum arguments
+if [ $# -lt 2 ]; then
+    show_usage
+fi
 
-get_results_dir() {
-    local prog_dir="$1"
-    echo "$prog_dir/results"
-}
+command=$1
+program=$2
+test_name=$3
 
-run_emulator() {
-    local prog_file="$1"
-    local mem_file="$2"
-    local verbose="$3"
-    local test_name=$(get_test_name "$mem_file")
-    local prog_dir=$(dirname "$prog_file")
-    local results_dir=$(get_results_dir "$prog_dir")
-    local output_file="$results_dir/emulator/${test_name}.txt"
-    
-    echo -e "\nRunning emulator with memory file: $mem_file"
-    echo "Results will be saved to: $output_file"
-    echo "----------------------------------------"
-    
-    # Create results directory
-    mkdir -p "$results_dir/emulator"
-    
-    # Run emulator and save results
-    # Use absolute paths for both program and memory files
-    prog_abs_path="$ROOT_DIR/$prog_file"
-    mem_abs_path="$ROOT_DIR/$mem_file"
-    
-    if [ "$verbose" = "true" ]; then
-        ./Pipeline/Emulator/src/run.py "$prog_abs_path" "$mem_abs_path" "$output_file" --verbose
-    else
-        ./Pipeline/Emulator/src/run.py "$prog_abs_path" "$mem_abs_path" "$output_file"
-    fi
-    local status=$?
-    echo "----------------------------------------"
-    return $status
-}
-
-case "$1" in
-    "emu")
-        if [ $# -lt 3 ]; then
-            echo "Error: emu command requires program and test name"
-            echo "Usage: tuca emu <program> <test or all> [--verbose]"
-            exit 1
-        fi
-        program_dir="$2"
-        test_name="$3"
-        verbose=false
-        
-        # Check for verbose flag
-        if [ "$4" = "--verbose" ]; then
-            verbose=true
-        fi
-        
-        # Setup paths
-        prog_dir="Programs/$program_dir"
-        prog_file="$prog_dir/prog.txt"
-        test_mems_dir="$prog_dir/test_mems"
-        
-        # Check if program exists
-        if [ ! -d "$prog_dir" ]; then
-            echo "Error: Program directory $prog_dir not found"
-            exit 1
-        fi
-        
-        # Check if program file exists
-        if [ ! -f "$prog_file" ]; then
-            echo "Error: Program file $prog_file not found"
-            exit 1
-        fi
-        
-        # Handle test name vs 'all'
-        if [ "$test_name" = "all" ]; then
-            # Run all tests in test_mems directory
-            if [ ! -d "$test_mems_dir" ]; then
-                echo "Error: Test directory $test_mems_dir not found"
-                exit 1
-            fi
-            
-            echo "Running emulator on all tests in $test_mems_dir"
-            success=true
-            found_files=false
-            
-            # Find all .txt files and sort them
-            while IFS= read -r mem_file; do
-                found_files=true
-                run_emulator "$prog_file" "$mem_file" "$verbose" || success=false
-            done < <(find "$test_mems_dir" -name "*.txt" | sort)
-            
-            if [ "$found_files" = false ]; then
-                echo "Error: No .txt files found in $test_mems_dir"
-                exit 1
-            fi
-            
-            $success || exit 1
-        else
-            # Run specific test
-            mem_file="$test_mems_dir/${test_name}.txt"
-            if [ ! -f "$mem_file" ]; then
-                echo "Error: Test file $mem_file not found"
-                exit 1
-            fi
-            run_emulator "$prog_file" "$mem_file" "$verbose" || exit 1
-        fi
-        ;;
+case $command in
     "build")
-        if [ $# -ne 2 ]; then
-            echo "Error: build command requires a program name"
+        if [ -z "$program" ]; then
+            echo "Error: build command requires program name"
             echo "Usage: tuca build <program>"
             exit 1
         fi
-        ./scripts/build.py build "$2"
+        # Run assembler to generate .mem file
+        python3 "$ROOT_DIR/Pipeline/Assembler/src/build.py" \
+            "$ROOT_DIR/Programs/$program/prog.txt" \
+            "$ROOT_DIR/Programs/$program/build/prog.mem"
         ;;
-    "verify")
-        if [ $# -ne 3 ]; then
-            echo "Error: verify command requires program and test name"
-            echo "Usage: tuca verify <program> <test_name>"
+        
+    "emu")
+        if [ -z "$program" ]; then
+            echo "Error: emu command requires program name"
+            echo "Usage: tuca emu <program> [test] [--verbose]"
             exit 1
         fi
-        ./scripts/verify.py "$2" "$3"
+        
+        prog_abs_path="$ROOT_DIR/Programs/$program/prog.txt"
+        
+        if [ -z "$test_name" ] || [ "$test_name" = "--verbose" ]; then
+            # Run all tests (pass only program path and any flags)
+            shift 2  # Remove 'emu' and program name
+            python3 "$ROOT_DIR/Pipeline/Emulator/src/run.py" "$prog_abs_path" $@
+        else
+            # Run specific test
+            mem_file="test_mems/$test_name.txt"
+            mem_abs_path="$ROOT_DIR/Programs/$program/$mem_file"
+            output_file="$ROOT_DIR/Programs/$program/results/emulator/$test_name.txt"
+            shift 3  # Remove 'emu', program name, and test name
+            python3 "$ROOT_DIR/Pipeline/Emulator/src/run.py" "$prog_abs_path" "$mem_abs_path" "$output_file" $@
+        fi
         ;;
+        
+    "verify")
+        if [ -z "$program" ] || [ -z "$test_name" ]; then
+            echo "Error: verify command requires program and test name"
+            echo "Usage: tuca verify <program> <test>"
+            exit 1
+        fi
+        python3 "$ROOT_DIR/scripts/verify.py" \
+            "$ROOT_DIR/Programs/$program/results/emulator/$test_name.txt" \
+            "$ROOT_DIR/Programs/$program/results/verilog/$test_name.txt"
+        ;;
+        
     "clean")
-        shift  # Remove 'clean' from args
-        ./scripts/build.py clean "$@"
+        python3 "$ROOT_DIR/scripts/clean.py" ${program:+"$ROOT_DIR/Programs/$program"}
         ;;
+        
     *)
-        usage
-        exit 1
+        echo "Error: Unknown command '$command'"
+        show_usage
         ;;
 esac 

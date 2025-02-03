@@ -267,14 +267,21 @@ The emulator has two operating modes:
 
 1. **Minimal Mode** (Default):
 
-   - Only shows final memory state
+   - Shows final memory map
    - Shows verification result (✅ or ❌)
-   - Perfect for automated testing
+   - Perfect for automated testing and quick checks
 
 2. **Verbose Mode** (with --verbose):
    - Shows full instruction execution trace
-   - Displays register state after each instruction
+   - Shows register state after each instruction
+   - Shows final memory map
    - Perfect for debugging and understanding program flow
+
+Both modes will display:
+
+- The final memory map showing all non-zero memory locations
+- Test verification results when running against test cases
+- Any errors or issues encountered during execution
 
 ### Verifying Results
 
