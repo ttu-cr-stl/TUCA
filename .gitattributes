@@ -1,0 +1,32 @@
+# Default behavior: normalize line endings to LF on checkin,
+# and prevent conversion to CRLF on checkout
+* text=auto eol=lf
+
+# Python files
+*.py text diff=python
+requirements.txt text
+
+# Shell scripts
+*.sh text eol=lf
+scripts/tuca text eol=lf
+
+# Windows scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# TUCA specific files
+*.txt text eol=lf
+*.json text eol=lf
+*.mem text eol=lf
+
+# Documentation
+*.md text diff=markdown
+LICENSE text
+
+# Binary files (no line-ending conversion)
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary 

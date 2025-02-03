@@ -23,6 +23,14 @@ TUCA is a computer architecture developed at Texas Tech University for education
    cd TUCA
    ```
 
+   Note: The repository uses Git's line ending handling to ensure consistent behavior across platforms.
+   On Windows, you may want to configure Git to maintain line endings:
+
+   ```bash
+   # Configure Git (before cloning)
+   git config --global core.autocrlf input
+   ```
+
 2. **Set Up Python Environment**:
 
    ```bash
