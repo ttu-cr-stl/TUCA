@@ -1,26 +1,69 @@
 # TUCA (TTU Computer Architecture)
 
 ![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![Version](https://img.shields.io/badge/version-5.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-TUCA is a computer architecture developed at Texas Tech University - Costa Rica for educational purposes by Dr. Juan Carlos Rojas. This repository contains a complete educational computer architecture toolkit including an assembler, emulator, and Verilog implementation, along with a comprehensive build and testing system.
+TUCA is a complete educational computer architecture developed at Texas Tech University - Costa Rica by Dr. Juan Carlos Rojas. It provides a full toolchain for learning computer architecture concepts, from assembly programming to hardware implementation.
 
-## Features
+## Pipeline Overview
+
+The TUCA architecture is implemented through three main components that work together to form a complete development and verification pipeline:
+
+```mermaid
+graph LR
+    A[Assembly Code] --> B[Assembler]
+    B --> C[Machine Code]
+    C --> D[Processor]
+    A --> E[Emulator]
+    E -.-> F[Verification]
+    D -.-> F
+```
+
+### 🔧 [Assembler](Pipeline/Assembler/)
+
+Converts TUCA assembly code into machine code:
+
+- Full TUCA-5.1 instruction set support
+- Label resolution and error checking
+- Generates memory initialization files
+- Used by both emulator and processor
+
+### 💻 [Emulator](Pipeline/Emulator/)
+
+Software implementation of the TUCA processor:
+
+- Direct assembly code interpretation
+- Interactive debugging capabilities
+- Cycle-accurate execution
+- Memory and register visualization
+
+### ⚡ [Processor](Pipeline/Processor/)
+
+Hardware implementation in Verilog:
+
+- 5-stage pipeline architecture
+- Harvard memory architecture
+- Hazard detection and forwarding
+- Synthesizable for FPGA
+
+## Key Features
 
 - **Complete Architecture Implementation**
-  - Custom instruction set architecture (ISA)
+  - 16-bit RISC architecture
+  - 16 general-purpose registers
   - Memory-mapped I/O support
   - Pipeline implementation in Verilog
 - **Development Tools**
-  - Assembler for converting TUCA assembly to machine code
-  - Emulator for direct assembly code interpretation
-  - Hardware implementation in Verilog
-  - Unified build and test system
+  - Unified build system
+  - Automated testing framework
+  - Interactive debugging
+  - Performance analysis
 - **Educational Resources**
-  - Example programs and test cases
-  - Comprehensive documentation
+  - Example programs
   - Step-by-step tutorials
-  - Interactive debugging support
+  - Comprehensive documentation
+  - Verification framework
 
 ## TUCA Architecture Overview
 
@@ -372,6 +415,11 @@ The build system generates three types of results:
 - [Assembler Documentation](Pipeline/Assembler/README.md)
 - [Emulator Documentation](Pipeline/Emulator/README.md)
 - [Processor Documentation](Pipeline/Processor/README.md)
+
+## Authors
+
+- **Dr. Juan Carlos Rojas** - _Initial Design and Development_
+- **Andres Antillon** - _Emulator Modifications and Build System_
 
 ## Contributing
 
