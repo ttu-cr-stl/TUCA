@@ -57,9 +57,13 @@ case $command in
         
         prog_abs_path="$ROOT_DIR/Programs/$program/prog.txt"
         
-        if [ -z "$test_name" ] || [ "$test_name" = "--verbose" ]; then
+        # If no test name or test name is "all", run all tests from config
+        if [ -z "$test_name" ] || [ "$test_name" = "--verbose" ] || [ "$test_name" = "all" ]; then
             # Run all tests (pass only program path and any flags)
             shift 2  # Remove 'emu' and program name
+            if [ "$test_name" = "all" ]; then
+                shift 1  # Remove 'all'
+            fi
             python3 "$ROOT_DIR/Pipeline/Emulator/src/run.py" "$prog_abs_path" $@
         else
             # Run specific test

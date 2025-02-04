@@ -13,7 +13,6 @@ if "%1"=="--help" goto :usage
 
 if "%1"=="emu" (
     if "%2"=="" goto :usage
-    if "%3"=="" goto :usage
     
     set "program_dir=%2"
     set "test_name=%3"
@@ -21,11 +20,11 @@ if "%1"=="emu" (
     
     REM Check for verbose flag
     if "%4"=="--verbose" set "verbose=true"
+    if "%3"=="--verbose" set "verbose=true"
     
     REM Setup paths
     set "prog_dir=Programs\%program_dir%"
     set "prog_file=%prog_dir%\prog.txt"
-    set "test_mems_dir=%prog_dir%\test_mems"
     
     REM Check if program exists
     if not exist "%prog_dir%" (
@@ -39,38 +38,36 @@ if "%1"=="emu" (
         exit /b 1
     )
     
-    if "%test_name%"=="all" (
-        REM Run all tests in test_mems directory
-        if not exist "%test_mems_dir%" (
-            echo Error: Test directory %test_mems_dir% not found
-            exit /b 1
-        )
-        
-        echo Running emulator on all tests in %test_mems_dir%
-        set "success=true"
-        set "found_files=false"
-        
-        for %%f in ("%test_mems_dir%\*.txt") do (
-            set "found_files=true"
-            call :run_emulator "%prog_file%" "%%f" "%verbose%" || set "success=false"
-        )
-        
-        if "%found_files%"=="false" (
-            echo Error: No .txt files found in %test_mems_dir%
-            exit /b 1
-        )
-        
-        if "%success%"=="false" exit /b 1
+    REM If no test specified, test is "all", or only --verbose flag, run all tests from config
+    if "%test_name%"=="" (
+        python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" %4
+        exit /b %ERRORLEVEL%
+    ) else if "%test_name%"=="--verbose" (
+        python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" --verbose
+        exit /b %ERRORLEVEL%
+    ) else if "%test_name%"=="all" (
+        python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" %4
+        exit /b %ERRORLEVEL%
     ) else (
         REM Run specific test
-        set "mem_file=%test_mems_dir%\%test_name%.txt"
+        set "mem_file=%prog_dir%\test_mems\%test_name%.txt"
+        set "output_file=%prog_dir%\results\emulator\%test_name%.txt"
+        
         if not exist "%mem_file%" (
             echo Error: Test file %mem_file% not found
             exit /b 1
         )
-        call :run_emulator "%prog_file%" "%mem_file%" "%verbose%" || exit /b 1
+        
+        REM Create results directory if it doesn't exist
+        if not exist "%prog_dir%\results\emulator" mkdir "%prog_dir%\results\emulator"
+        
+        if "%verbose%"=="true" (
+            python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" "%mem_file%" "%output_file%" --verbose
+        ) else (
+            python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" "%mem_file%" "%output_file%"
+        )
+        exit /b %ERRORLEVEL%
     )
-    exit /b 0
 )
 
 if "%1"=="build" (
@@ -124,31 +121,4 @@ echo   clean [program...]    Clean build artifacts
 echo     Example: tuca clean              # Clean all
 echo             tuca clean example1      # Clean specific program
 echo             tuca clean p1 p2         # Clean multiple programs
-exit /b 1
-
-:run_emulator
-set "prog_file=%~1"
-set "mem_file=%~2"
-set "verbose=%~3"
-for %%F in ("%mem_file%") do set "test_name=%%~nF"
-set "prog_dir=%~dp1"
-set "results_dir=%prog_dir%results"
-set "output_file=%results_dir%\emulator\%test_name%.txt"
-
-echo.
-echo Running emulator with memory file: %mem_file%
-echo Results will be saved to: %output_file%
-echo ----------------------------------------
-
-REM Create results directory
-if not exist "%results_dir%\emulator" mkdir "%results_dir%\emulator"
-
-REM Run emulator and save results
-if "%verbose%"=="true" (
-    python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" "%mem_file%" "%output_file%" --verbose
-) else (
-    python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" "%mem_file%" "%output_file%"
-)
-set "status=%ERRORLEVEL%"
-echo ----------------------------------------
-exit /b %status% 
+exit /b 1 
