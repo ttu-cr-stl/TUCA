@@ -7,7 +7,7 @@ This directory contains TUCA assembly programs and their associated test cases. 
 Each program directory should follow this structure:
 
 ```
-hw1/                    # Program directory
+prog1/                    # Program directory
 ├── prog.txt           # Main assembly program
 ├── config.json        # Test configuration
 ├── test_mems/         # Test memory files
