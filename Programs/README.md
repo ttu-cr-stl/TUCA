@@ -1,6 +1,6 @@
 # TUCA Programs
 
-This directory contains TUCA assembly programs and their associated test cases. Each program is organized in its own directory (e.g., `hw1/`, `hw2/`, etc.) with a standardized structure.
+This directory contains TUCA assembly programs and their associated test cases. Each program is organized in its own directory (e.g., `prog1/`, `prog2/`, etc.) with a standardized structure.
 
 ## Directory Structure
 
