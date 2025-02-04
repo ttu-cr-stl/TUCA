@@ -47,22 +47,33 @@ hw1/                    # Program directory
 
 ### Test Memory Files (`test_mems/*.txt`)
 
-- Each line number corresponds to its memory address (line 1 = address 0x00, line 2 = address 0x01, etc.)
-- Values are in hex format (with or without 0x prefix)
-- Empty lines or lines starting with # are ignored
-- If you provide less than 256 values, the rest of the memory positions will be filled with zeros
-- Example:
-  ```
-  # Memory initialization
-  42    # mem[0x00] = 0x42 (line 1)
-  24    # mem[0x01] = 0x24 (line 2)
-  66    # mem[0x02] = 0x66 (line 3)
-  ```
-  This initializes:
-  - Memory address 0x00 with value 0x42
-  - Memory address 0x01 with value 0x24
-  - Memory address 0x02 with value 0x66
-  - All remaining memory positions are filled with zeros
+- Each line represents a sequential memory address starting from 0x00
+- Values must be either:
+  - Binary format (all 1s and 0s), or
+  - Hex format with 0x prefix (e.g., `0x42`)
+- Values must come first in the file, before any comments
+- Comments (starting with #) and empty lines are only allowed AFTER all memory values
+- If a comment or empty line appears before values, it will be treated as a memory location with value 0x00
+
+Example:
+
+```
+0x42    # This will be at memory[0x00]
+0x24    # This will be at memory[0x01]
+0x66    # This will be at memory[0x02]
+# Any comments after values are fine
+# They won't affect memory initialization
+```
+
+❗ Important: Never put comments or empty lines before your memory values. This:
+
+```
+# This comment will be treated as memory[0x00] = 0x00
+0x42    # Now this will be at memory[0x01] instead of 0x00!
+0x24    # This will be at memory[0x02]
+```
+
+The rest of memory (addresses not specified) will be initialized to 0x00.
 
 ### Configuration File (`config.json`)
 
