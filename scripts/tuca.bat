@@ -16,7 +16,7 @@ if "%1"=="--help" goto :usage
 if "%1"=="emu" (
     if "%2"=="" goto :usage
     
-    set "program_dir=%2"
+    set "program_dir=%~2"
     set "test_name=%3"
     set "verbose=false"
     
@@ -25,7 +25,7 @@ if "%1"=="emu" (
     if "%3"=="--verbose" set "verbose=true"
     
     REM Setup paths (using proper Windows path separators)
-    set "prog_dir=%ROOT_DIR%\Programs\%program_dir%"
+    set "prog_dir=%ROOT_DIR%\Programs\!program_dir!"
     set "prog_file=!prog_dir!\prog.txt"
     
     echo Debug: Looking for program in: !prog_dir!
