@@ -4,11 +4,111 @@
 ![Version](https://img.shields.io/badge/version-5.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-TUCA is a complete educational computer architecture developed at Texas Tech University - Costa Rica by Dr. Juan Carlos Rojas. It provides a full toolchain for learning computer architecture concepts, from assembly programming to hardware implementation.
+> TUCA is a complete educational computer architecture developed at Texas Tech University - Costa Rica by Dr. Juan Carlos Rojas. It provides a full toolchain for learning computer architecture concepts, from assembly programming to hardware implementation.
 
-## Pipeline Overview
+## Quick Start Guide
 
-The TUCA architecture is implemented through three main components that work together to form a complete development and verification pipeline:
+```bash
+# 1. Configure Git (Windows users, before cloning)
+git config --global core.autocrlf input
+
+# 2. Clone and setup
+git clone https://github.com/yourusername/TUCA.git && cd TUCA
+
+# 3. Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate     # Linux/macOS
+.\venv\Scripts\activate      # Windows CMD
+.\venv\Scripts\Activate.ps1  # Windows PowerShell
+
+# 4. Install dependencies
+pip install -r requirements.txt
+
+# 5. Make TUCA executable (Linux/macOS)
+chmod +x scripts/tuca
+
+# 6. Try an example program
+./scripts/tuca build examples/addTwoNums  # (scripts\tuca.bat on Windows)
+./scripts/tuca emu examples/addTwoNums test1
+```
+
+## TUCA CLI Reference
+
+The `tuca` command-line tool is your primary interface to TUCA:
+
+### Command Format
+
+```bash
+tuca <command> [options]      # Linux/macOS with tuca in PATH
+./scripts/tuca <command>      # Linux/macOS direct
+scripts\tuca.bat <command>    # Windows
+```
+
+### Core Commands
+
+| Command  | Description                      | Example                       | Common Options |
+| -------- | -------------------------------- | ----------------------------- | -------------- |
+| `build`  | Compile assembly to machine code | `tuca build myprogram`        | None           |
+| `emu`    | Run program in emulator          | `tuca emu myprogram test1`    | `--verbose`    |
+| `verify` | Compare emulator vs hardware     | `tuca verify myprogram test1` | None           |
+| `clean`  | Remove build artifacts           | `tuca clean myprogram`        | None           |
+
+### Output Modes
+
+1. **Standard Mode** (Default)
+
+   - Shows final memory map (non-zero locations)
+   - Shows verification result (✅ or ❌)
+   - Perfect for automated testing and quick checks
+
+2. **Verbose Mode** (`--verbose`)
+   - Shows instruction-by-instruction execution
+   - Displays register states after each instruction
+   - Shows memory state changes
+   - Perfect for debugging and understanding program flow
+
+Example verbose output:
+
+```
+PC: 0x0000  Instruction: LDI R1, 0x05
+Registers: R1=0x0005 R2=0x0000 ...
+
+PC: 0x0001  Instruction: LDI R2, 0x03
+Registers: R1=0x0005 R2=0x0003 ...
+
+Final Memory State:
+0x00=0x05
+0x01=0x03
+0x02=0x08
+```
+
+### Common Workflows
+
+```bash
+# Development cycle
+tuca build myprogram
+tuca emu myprogram test1
+tuca emu myprogram test1 --verbose  # Debug mode
+
+# Batch testing
+tuca emu myprogram all
+tuca verify myprogram all
+
+# Cleanup
+tuca clean              # Clean all build artifacts
+tuca clean myprogram    # Clean specific program
+```
+
+## Architecture Overview
+
+TUCA is designed as an educational architecture demonstrating key concepts in computer organization:
+
+- **Simple but Complete ISA**: Essential instructions for computation and control flow
+- **Memory-Mapped I/O**: Hardware-software interface concepts
+- **Pipeline Implementation**: Modern processor design principles
+- **Verification Framework**: Comparison between emulation and hardware
+
+### Component Pipeline
 
 ```mermaid
 graph LR
@@ -20,7 +120,7 @@ graph LR
     D -.-> F
 ```
 
-### 🔧 [Assembler](Pipeline/Assembler/)
+### 🔧 Assembler
 
 Converts TUCA assembly code into machine code:
 
@@ -29,7 +129,7 @@ Converts TUCA assembly code into machine code:
 - Generates memory initialization files
 - Used by both emulator and processor
 
-### 💻 [Emulator](Pipeline/Emulator/)
+### 💻 Emulator
 
 Software implementation of the TUCA processor:
 
@@ -38,7 +138,7 @@ Software implementation of the TUCA processor:
 - Cycle-accurate execution
 - Memory and register visualization
 
-### ⚡ [Processor](Pipeline/Processor/)
+### ⚡ Processor
 
 Hardware implementation in Verilog:
 
@@ -47,36 +147,7 @@ Hardware implementation in Verilog:
 - Hazard detection and forwarding
 - Synthesizable for FPGA
 
-## Key Features
-
-- **Complete Architecture Implementation**
-  - 16-bit RISC architecture
-  - 16 general-purpose registers
-  - Memory-mapped I/O support
-  - Pipeline implementation in Verilog
-- **Development Tools**
-  - Unified build system
-  - Automated testing framework
-  - Interactive debugging
-  - Performance analysis
-- **Educational Resources**
-  - Example programs
-  - Step-by-step tutorials
-  - Comprehensive documentation
-  - Verification framework
-
-## TUCA Architecture Overview
-
-TUCA is designed as an educational architecture that demonstrates key concepts in computer organization:
-
-- **Simple but Complete ISA**: Includes essential instructions for computation and control flow
-- **Memory-Mapped I/O**: Demonstrates hardware-software interface concepts
-- **Pipeline Implementation**: Shows modern processor design principles
-- **Verification Framework**: Enables comparison between emulation and hardware implementation
-
-## Setup
-
-### Prerequisites
+## System Requirements
 
 - Python 3.8 or higher
 - Git
@@ -86,101 +157,70 @@ TUCA is designed as an educational architecture that demonstrates key concepts i
     - Windows Subsystem for Linux (WSL) - Recommended
     - Native Windows (using `tuca.bat`)
 
-### Installation
+## Installation Details
 
-1. **Clone the Repository**:
+### 1. Repository Setup
 
-   ```bash
-   git clone https://github.com/yourusername/TUCA.git
-   cd TUCA
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/TUCA.git
+cd TUCA
+```
 
-   Note: The repository uses Git's line ending handling to ensure consistent behavior across platforms.
-   On Windows, you may want to configure Git to maintain line endings:
+### 2. Python Environment
 
-   ```bash
-   # Configure Git (before cloning)
-   git config --global core.autocrlf input
-   ```
+```bash
+# Create virtual environment
+python -m venv venv
 
-2. **Set Up Python Environment**:
+# Activate (system-specific):
+source venv/bin/activate     # Linux/macOS
+.\venv\Scripts\activate      # Windows CMD
+.\venv\Scripts\Activate.ps1  # Windows PowerShell
 
-   ```bash
-   # Create a virtual environment
-   python -m venv venv
+# Install dependencies
+pip install -r requirements.txt
+```
 
-   # Activate it (choose one based on your system):
-   source venv/bin/activate     # Linux/macOS
-   .\venv\Scripts\activate      # Windows CMD
-   .\venv\Scripts\Activate.ps1  # Windows PowerShell
+### 3. Tool Configuration
 
-   # Install dependencies
-   pip install -r requirements.txt
-   ```
+Linux/macOS:
 
-3. **Configure the Tool**:
+```bash
+# Make executable
+chmod +x scripts/tuca
 
-   On Linux/macOS:
+# Test installation
+./scripts/tuca --help
+```
 
-   ```bash
-   # Make the tuca script executable
-   chmod +x scripts/tuca
+Windows:
 
-   # Test the installation
-   ./scripts/tuca --help
-   ```
+```cmd
+# Test installation
+scripts\tuca.bat --help
+```
 
-   On Windows:
+### 4. Optional: Add to PATH
 
-   ```cmd
-   # Test the installation (CMD or PowerShell)
-   scripts\tuca.bat --help
-   ```
+Linux/macOS:
 
-4. **Optional: Add to PATH**:
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export PATH="/absolute/path/to/TUCA/scripts:$PATH"
+source ~/.bashrc  # or ~/.zshrc
+```
 
-   To run the `tuca` command from any directory:
+Windows:
 
-   On Linux/macOS:
+```powershell
+# Via PowerShell
+$env:Path += ";C:\path\to\TUCA\scripts"
 
-   ```bash
-   # Add to your ~/.bashrc, ~/.zshrc, or equivalent
-   export PATH="/absolute/path/to/TUCA/scripts:$PATH"
-   source ~/.bashrc  # or ~/.zshrc
-   ```
-
-   On Windows:
-
-   ```cmd
-   # Add to your system environment variables:
-   # Control Panel > System > Advanced System Settings > Environment Variables
-   # Add the full path to TUCA\scripts to your PATH
-   # Or from PowerShell:
-   $env:Path += ";C:\path\to\TUCA\scripts"
-   ```
-
-### Verifying Installation
-
-After installation, you should be able to:
-
-1. Run the help command:
-   ```bash
-   ./scripts/tuca --help      # Linux/macOS
-   scripts\tuca.bat --help    # Windows
-   # Or if added to PATH:
-   tuca --help               # Linux/macOS
-   tuca.bat --help          # Windows
-   ```
-2. See the list of available commands
-3. Access the example programs in the `Programs` directory
-
-If you encounter any issues, please check:
-
-- Python version: `python --version`
-- Virtual environment is activated (you should see `(venv)` in your prompt)
-- All dependencies are installed: `pip list`
-- On Windows, ensure you're using the correct script (`tuca.bat`)
-- On Linux/macOS, ensure `scripts/tuca` has execute permissions
+# Or via System Settings:
+# Control Panel > System > Advanced System Settings > Environment Variables
+# Add full path to TUCA\scripts to PATH
+```
 
 ## Project Structure
 
@@ -202,14 +242,11 @@ TUCA/
 │       │   ├── test1.txt # Initial memory state for test1
 │       │   └── test2.txt # Initial memory state for test2
 │       ├── build/        # Build artifacts
-│       │   └── prog.mem      # Compiled program
+│       │   └── prog.mem  # Compiled program
 │       └── results/      # Test results
-│           ├── emulator/     # Emulator results
-│           │   └── test1.txt
-│           ├── verilog/      # Verilog results
-│           │   └── test1.txt
-│           └── verify/       # Verification reports
-│               └── test1.txt
+│           ├── emulator/ # Emulator results
+│           ├── verilog/  # Verilog results
+│           └── verify/   # Verification reports
 ├── Examples/         # Example programs
 ├── Docs/            # Documentation
 └── scripts/         # Build and test tools
@@ -218,33 +255,42 @@ TUCA/
     └── tuca         # Command-line interface
 ```
 
+## Program Development
+
+### Program Structure
+
+Each TUCA program requires:
+
+```
+myprogram/
+├── prog.txt         # Assembly code
+├── config.json      # Test configuration
+└── test_mems/       # Test memory files
+    └── test1.txt    # Initial memory state
+```
+
 ### Test Memory Files
 
-Test memory files (`test_mems/*.txt`) specify the initial state of memory for each test case. Each line in the file represents a sequential memory location starting from address 0x00. The format is:
+Test memory files (`test_mems/*.txt`) specify initial memory state:
 
-- Values must be in hexadecimal format with `0x` prefix (e.g., `0xFF`)
-- Values must come first in the file, before any comments
-- Comments (starting with `#`) and empty lines are only allowed after all memory values
-- Each non-comment line represents the next sequential memory location
+- Values in hexadecimal with `0x` prefix
+- Values must come before any comments
+- Each line = sequential memory location from 0x00
+- Comments start with `#`
 
-Example test memory file (`test1.txt`):
+Example (`test1.txt`):
 
 ```
-0x05    # This will be at memory[0x00]
-0x03    # This will be at memory[0x01]
-# This is a test case that adds 5 + 3
+0x05    # memory[0x00]
+0x03    # memory[0x01]
+# Values must come before comments
 ```
 
-This would initialize:
-
-- `memory[0x00] = 0x05`
-- `memory[0x01] = 0x03`
-
-❗ Important: Comments and empty lines at the beginning of the file will be counted as memory locations with value 0x00. Always put memory values first, then comments.
+❗ Important: Comments/empty lines at file start count as 0x00 memory locations.
 
 ### Test Configuration
 
-The `config.json` file specifies test cases and their expected results:
+`config.json` specifies test cases and expected results:
 
 ```json
 {
@@ -264,212 +310,63 @@ The `config.json` file specifies test cases and their expected results:
 }
 ```
 
-Each test case:
-
-- Loads initial memory state from a test memory file
-- Runs the program
-- Verifies memory contents match expected values
-
-## Quick Start
-
-1. **Create a New Program**:
-
-   Create a new directory for your program with this structure:
-
-```
-Programs/
-└── example1/ # Your program directory
-├── prog.txt # Your assembly program
-├── config.json # Test configuration
-└── test_mems/ # Test memory files
-└── test1.txt # Initial memory state
-
-```
-
-You can create this structure:
-
-- Using your file explorer
-- Using command line:
-
-  ```bash
-  # Linux/macOS
-  mkdir -p Programs/example1/test_mems
-
-  # Windows (CMD)
-  mkdir Programs\example1\test_mems
-  ```
-
-2. **Write Your Program**:
-
-Create `Programs/example1/prog.txt` using any text editor and write your TUCA assembly code.
-
-3. **Configure Tests**:
-
-Create `Programs/example1/config.json`:
-
-```json
-{
-  "program": "prog.txt",
-  "test_cases": [
-    {
-      "name": "test1",
-      "memory": "test_mems/test1.txt",
-      "expected": {
-        "memory": {
-          "0x02": "0x10"
-        }
-      }
-    }
-  ]
-}
-```
-
-4. **Build and Test**:
-
-   Linux/macOS:
-
-   ```bash
-   ./scripts/tuca build example1
-   ./scripts/tuca emu example1 test1
-   ```
-
-   Windows:
-
-   ```cmd
-   scripts\tuca.bat build example1
-   scripts\tuca.bat emu example1 test1
-   ```
-
-   Or if `tuca` is in your PATH:
-
-   ```bash
-   tuca build example1
-   tuca emu example1 test1     # Linux/macOS
-   tuca.bat emu example1 test1 # Windows
-   ```
-
-## Build System
-
-The `tuca` command provides a unified interface for all development tasks:
-
-### Building Programs
-
-Linux/macOS:
-
-```bash
-./scripts/tuca build example1          # Build program
-# Or if in PATH:
-tuca build example1
-```
-
-Windows:
-
-```cmd
-scripts\tuca.bat build example1
-# Or if in PATH:
-tuca.bat build example1
-```
-
-### Running Tests
-
-Linux/macOS:
-
-```bash
-./scripts/tuca emu example1 test1      # Run specific test (minimal output)
-./scripts/tuca emu example1 test1 --verbose  # Show detailed execution trace
-./scripts/tuca emu example1 all        # Run all tests
-```
-
-Windows:
-
-```cmd
-scripts\tuca.bat emu example1 test1
-scripts\tuca.bat emu example1 test1 --verbose
-scripts\tuca.bat emu example1 all
-```
-
-The emulator has two operating modes:
-
-1. **Minimal Mode** (Default):
-
-   - Shows final memory map (only non-zero locations)
-   - Shows verification result (✅ or ❌)
-   - Perfect for automated testing and quick checks
-
-2. **Verbose Mode** (with --verbose):
-   - Shows full instruction execution trace
-   - Shows register state after each instruction
-   - Shows final memory map (only non-zero locations)
-   - Perfect for debugging and understanding program flow
-
-Both modes will display:
-
-- The final memory map showing only non-zero memory locations
-- Test verification results when running against test cases
-- Any errors or issues encountered during execution
-
-Note: Memory locations containing 0x00 are not displayed in the final memory map to reduce clutter. This does not mean they don't exist - they are still part of the program's memory state.
-
-### Verifying Results
-
-Linux/macOS:
-
-```bash
-./scripts/tuca verify example1 test1   # Compare emulator vs Verilog
-```
-
-Windows:
-
-```cmd
-scripts\tuca.bat verify example1 test1
-```
-
-### Cleaning Build Artifacts
-
-Linux/macOS:
-
-```bash
-./scripts/tuca clean              # Clean all
-./scripts/tuca clean example1     # Clean specific program
-```
-
-Windows:
-
-```cmd
-scripts\tuca.bat clean
-scripts\tuca.bat clean example1
-```
-
-## Test Results
+## Build System Output
 
 The build system generates three types of results:
 
-1. **Emulator Results** (`results/emulator/`):
-
-   - Output from running program through emulator
-   - Format: `0xAA=0xBB` (hex addresses and values)
+1. **Emulator Results** (`results/emulator/`)
 
    ```
    0x02=0x42  # memory[0x02] = 0x42
    0x03=0xFF  # memory[0x03] = 0xFF
    ```
 
-2. **Verilog Results** (`results/verilog/`):
+2. **Verilog Results** (`results/verilog/`)
 
-   - Output from Verilog simulation
-   - Same format as emulator for easy comparison
+   - Same format as emulator output
+   - Used for comparison
 
-3. **Verification Reports** (`results/verify/`):
-   - Detailed comparison of emulator vs Verilog
-   - Shows expected values from config.json
-   - Highlights any mismatches with ❌
-   - Shows ✅ when all values match
+3. **Verification Reports** (`results/verify/`)
+   - Compares emulator vs Verilog
+   - Shows expected values
+   - Marks mismatches (❌) and matches (✅)
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Python Environment**
+
+   - Check Python version: `python --version`
+   - Verify virtual env: Look for `(venv)` in prompt
+   - Check dependencies: `pip list`
+
+2. **Permission Issues**
+
+   - Linux/macOS: `chmod +x scripts/tuca`
+   - Check file ownership/permissions
+
+3. **Path Issues**
+   - Verify PATH configuration
+   - Use absolute paths if needed
+   - Check for spaces in paths
+
+### Getting Help
+
+- Review [Documentation](Docs/)
+- Check [Example Programs](Examples/)
+- File GitHub issues
+- Contact development team
 
 ## Documentation
 
 - [Assembler Documentation](Pipeline/Assembler/README.md)
 - [Emulator Documentation](Pipeline/Emulator/README.md)
 - [Processor Documentation](Pipeline/Processor/README.md)
+- [Architecture Specification](Docs/architecture.md)
+- [Assembly Language Reference](Docs/assembly.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Change Log](CHANGELOG.md)
 
 ## Authors
 
@@ -483,37 +380,3 @@ The build system generates three types of results:
 ## License
 
 [Add license information here]
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Python Environment Problems**
-
-   - Ensure Python 3.8+ is installed: `python --version`
-   - Virtual environment is active (look for `(venv)` in prompt)
-   - All dependencies are installed: `pip list`
-
-2. **Permission Issues**
-
-   - On Linux/macOS: `chmod +x scripts/tuca`
-   - Check file ownership and permissions
-
-3. **Path Issues**
-   - Verify PATH configuration
-   - Use absolute paths if needed
-   - Check for spaces in directory names
-
-### Getting Help
-
-- Check the [Documentation](Docs/)
-- Review [Example Programs](Examples/)
-- File an issue on GitHub
-- Contact the development team
-
-## Additional Resources
-
-- [TUCA Architecture Specification](Docs/architecture.md)
-- [Assembly Language Reference](Docs/assembly.md)
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Change Log](CHANGELOG.md)
