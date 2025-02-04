@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 REM Get the directory where this script is located
 set "SCRIPT_DIR=%~dp0"
@@ -23,48 +23,52 @@ if "%1"=="emu" (
     if "%3"=="--verbose" set "verbose=true"
     
     REM Setup paths
-    set "prog_dir=Programs\%program_dir%"
-    set "prog_file=%prog_dir%\prog.txt"
+    set "prog_dir=%ROOT_DIR%\Programs\%program_dir%"
+    set "prog_file=!prog_dir!\prog.txt"
+    
+    echo Debug: Checking directory !prog_dir!
     
     REM Check if program exists
-    if not exist "%prog_dir%" (
-        echo Error: Program directory %prog_dir% not found
+    if not exist "!prog_dir!" (
+        echo Error: Program directory !prog_dir! not found
         exit /b 1
     )
     
     REM Check if program file exists
-    if not exist "%prog_file%" (
-        echo Error: Program file %prog_file% not found
+    if not exist "!prog_file!" (
+        echo Error: Program file !prog_file! not found
         exit /b 1
     )
     
     REM If no test specified, test is "all", or only --verbose flag, run all tests from config
     if "%test_name%"=="" (
-        python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" %4
+        python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" %4
         exit /b %ERRORLEVEL%
     ) else if "%test_name%"=="--verbose" (
-        python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" --verbose
+        python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" --verbose
         exit /b %ERRORLEVEL%
     ) else if "%test_name%"=="all" (
-        python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" %4
+        python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" %4
         exit /b %ERRORLEVEL%
     ) else (
         REM Run specific test
-        set "mem_file=%prog_dir%\test_mems\%test_name%.txt"
-        set "output_file=%prog_dir%\results\emulator\%test_name%.txt"
+        set "mem_file=!prog_dir!\test_mems\%test_name%.txt"
+        set "output_file=!prog_dir!\results\emulator\%test_name%.txt"
         
-        if not exist "%mem_file%" (
-            echo Error: Test file %mem_file% not found
+        echo Debug: Looking for test file !mem_file!
+        
+        if not exist "!mem_file!" (
+            echo Error: Test file !mem_file! not found
             exit /b 1
         )
         
         REM Create results directory if it doesn't exist
-        if not exist "%prog_dir%\results\emulator" mkdir "%prog_dir%\results\emulator"
+        if not exist "!prog_dir!\results\emulator" mkdir "!prog_dir!\results\emulator"
         
         if "%verbose%"=="true" (
-            python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" "%mem_file%" "%output_file%" --verbose
+            python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" "!mem_file!" "!output_file!" --verbose
         ) else (
-            python "%ROOT_DIR%\Pipeline\Emulator\src\run.py" "%prog_file%" "%mem_file%" "%output_file%"
+            python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" "!mem_file!" "!output_file!"
         )
         exit /b %ERRORLEVEL%
     )
