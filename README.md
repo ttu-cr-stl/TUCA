@@ -358,6 +358,44 @@ The build system generates three types of results:
 - File GitHub issues
 - Contact development team
 
+## Development Tools
+
+### VS Code Extension
+
+A dedicated Visual Studio Code extension is available for TUCA Assembly development. The extension provides syntax highlighting and language support to enhance your TUCA programming experience.
+
+#### Features
+
+- **Syntax Highlighting**
+
+  - Instructions (ld, st, add, etc.) in purple/magenta
+  - Registers (r0-r15) in blue
+  - Labels (ending with :) in yellow/gold
+  - Definitions (def statements) in purple
+  - Numbers (hex and decimal) in light green
+  - Comments (# lines) in green
+  - Special variables (op1, op2, result, etc.) in light blue
+
+- **Code Organization**
+  - Comment support (# for line comments)
+  - Code folding for labeled sections
+  - Macro definition highlighting
+  - Support for both hex (0x) and decimal numbers
+
+#### Installation
+
+1. Open VS Code
+2. Press `Ctrl+P` (or `Cmd+P` on macOS)
+3. Paste the following command:
+   ```
+   ext install axantillon.tuca-assembly-syntax
+   ```
+4. Press Enter
+
+The syntax highlighting will automatically activate for any `.txt` file containing TUCA assembly code.
+
+[Get it from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=axantillon.tuca-assembly-syntax)
+
 ## Documentation
 
 - [Assembler Documentation](Pipeline/Assembler/README.md)
