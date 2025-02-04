@@ -8,29 +8,199 @@
 
 ## Quick Start Guide
 
+### Prerequisites
+
+- Python 3.8 or higher
+- Git
+- VS Code (recommended) with TUCA Assembly extension
+
+### Step-by-Step Setup
+
+#### 1. Clone Repository (in Terminal/CMD)
+
+Open your terminal or command prompt and run:
+
 ```bash
-# 1. Configure Git (Windows users, before cloning)
+# Windows users only: Configure Git first
 git config --global core.autocrlf input
 
-# 2. Clone and setup
-git clone https://github.com/yourusername/TUCA.git && cd TUCA
+# Clone repository
+git clone https://github.com/yourusername/TUCA.git
+cd TUCA
+```
 
-# 3. Create and activate virtual environment
+#### 2. Open in Editor
+
+- Open VS Code
+- File > Open Folder > Select the TUCA folder you just cloned
+- Open the integrated terminal in VS Code (View > Terminal)
+  - Or continue using your standalone terminal
+
+#### 3. Setup Python Environment (in Terminal)
+
+```bash
+# Create virtual environment
+# For Windows:
 python -m venv venv
-source venv/bin/activate     # Linux/macOS
-.\venv\Scripts\activate      # Windows CMD
-.\venv\Scripts\Activate.ps1  # Windows PowerShell
+# For macOS/Linux:
+python3 -m venv venv
 
-# 4. Install dependencies
+# Activate virtual environment
+# For Windows CMD:
+.\venv\Scripts\activate
+# For Windows PowerShell:
+.\venv\Scripts\Activate.ps1
+# For macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
+```
 
-# 5. Make TUCA executable (Linux/macOS)
+#### 4. Setup TUCA CLI (in Terminal)
+
+```bash
+# For macOS/Linux only:
 chmod +x scripts/tuca
 
-# 6. Try an example program
-./scripts/tuca build examples/addTwoNums  # (scripts\tuca.bat on Windows)
-./scripts/tuca emu examples/addTwoNums test1
+# Verify installation
+# For Windows:
+scripts\tuca.bat --help
+# For macOS/Linux:
+./scripts/tuca --help
 ```
+
+#### Optional: Add TUCA to PATH (Unix/macOS)
+
+This allows you to run `tuca` directly instead of using `./scripts/tuca`:
+
+```bash
+# Add to your shell's rc file (~/.bashrc or ~/.zshrc):
+echo 'export PATH="$PATH:$PWD/scripts"' >> ~/.bashrc  # or ~/.zshrc
+source ~/.bashrc  # or ~/.zshrc
+
+# Verify it works
+tuca --help
+```
+
+Note: The above commands add the current directory's scripts folder to PATH. If you move the TUCA folder, you'll need to update the PATH.
+
+#### 5. Try an Example (in Terminal)
+
+```bash
+# For Windows:
+scripts\tuca.bat emu examples\addTwoNums     # Run all tests
+
+# For macOS/Linux:
+./scripts/tuca emu examples/addTwoNums       # If running directly
+tuca emu examples/addTwoNums                 # If TUCA is in PATH
+
+# Try with verbose output to see execution details
+scripts\tuca.bat emu examples\addTwoNums --verbose  # Windows
+./scripts/tuca emu examples/addTwoNums --verbose    # macOS/Linux direct
+tuca emu examples/addTwoNums --verbose             # macOS/Linux with PATH
+```
+
+Note: All program paths are relative to the `Programs/` directory. For example:
+
+- `examples/addTwoNums` → `Programs/examples/addTwoNums`
+- `someProgram` → `Programs/someProgram`
+
+### Program Directory Structure
+
+```
+your_program/
+├── prog.txt           # Your assembly program
+├── config.json        # Test configuration file
+└── test_mems/        # Directory containing test memory files
+    ├── mem1.txt      # Test case 1 initial memory
+    ├── mem2.txt      # Test case 2 initial memory
+    └── ...
+```
+
+### Required Files Format
+
+1. `config.json` (Minimum required structure):
+
+```json
+{
+  "program": "prog.txt",
+  "test_cases": [
+    {
+      "name": "mem1",
+      "memory": "test_mems/mem1.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x05" // Expected value at memory location
+        }
+      }
+    }
+  ]
+}
+```
+
+2. `test_mems/mem1.txt` (Memory file format):
+
+```
+0x05    # Values must come before comments
+0x03    # Each line = sequential memory location
+```
+
+### Common Commands
+
+```bash
+# Run all tests in a program (default behavior)
+scripts\tuca.bat emu your_program     # Windows
+./scripts/tuca emu your_program       # macOS/Linux direct
+tuca emu your_program                 # macOS/Linux with PATH
+
+# Run a specific test (when needed)
+scripts\tuca.bat emu your_program mem1  # Windows
+./scripts/tuca emu your_program mem1    # macOS/Linux direct
+tuca emu your_program mem1              # macOS/Linux with PATH
+
+# Run with verbose output (shows execution details)
+scripts\tuca.bat emu your_program --verbose  # Windows
+./scripts/tuca emu your_program --verbose    # macOS/Linux direct
+tuca emu your_program --verbose              # macOS/Linux with PATH
+```
+
+### Troubleshooting Common Issues
+
+1. **Repository Setup Issues**
+
+   - Ensure Git is installed and configured
+   - Check repository permissions
+   - Verify you're using the correct repository URL
+
+2. **Python Environment Issues**
+
+   - Verify Python version: `python --version`
+   - Ensure virtual environment is activated (look for `(venv)` in prompt)
+   - Check if all dependencies are installed: `pip list`
+
+3. **Program Directory Not Found**
+
+   - Ensure you're in the TUCA root directory
+   - Check that your program directory is in `Programs/`
+   - Directory name is case-sensitive
+
+4. **Config File Error**
+
+   - Ensure `config.json` exists in your program directory
+   - Verify JSON syntax is correct
+   - Check that test memory files exist in `test_mems/`
+
+5. **Memory File Format**
+
+   - Values must be in hex format with `0x` prefix
+   - Comments must come after values
+   - Each line represents sequential memory locations
+
+6. **Windows Path Issues**
+   - Use backslashes (`\`) in paths
+   - Enclose paths with spaces in quotes
+   - Run from TUCA root directory
 
 ## TUCA CLI Reference
 
