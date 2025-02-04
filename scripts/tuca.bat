@@ -1,9 +1,11 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-REM Get the directory where this script is located
+REM Get the directory where this script is located and convert to absolute path
 set "SCRIPT_DIR=%~dp0"
-set "ROOT_DIR=%SCRIPT_DIR%.."
+pushd "%SCRIPT_DIR%.."
+set "ROOT_DIR=%CD%"
+popd
 
 REM Change to root directory
 cd /d "%ROOT_DIR%"
@@ -26,17 +28,18 @@ if "%1"=="emu" (
     set "prog_dir=%ROOT_DIR%\Programs\%program_dir%"
     set "prog_file=!prog_dir!\prog.txt"
     
-    echo Debug: Checking directory !prog_dir!
+    echo Debug: Looking for program in: !prog_dir!
+    echo Debug: Looking for file: !prog_file!
     
     REM Check if program exists
     if not exist "!prog_dir!" (
-        echo Error: Program Directory not found
+        echo Error: Program Directory not found at: !prog_dir!
         exit /b 1
     )
     
     REM Check if program file exists
     if not exist "!prog_file!" (
-        echo Error: Program file not found
+        echo Error: Program file not found at: !prog_file!
         exit /b 1
     )
     
@@ -55,10 +58,10 @@ if "%1"=="emu" (
         set "mem_file=!prog_dir!\test_mems\%test_name%.txt"
         set "output_file=!prog_dir!\results\emulator\%test_name%.txt"
         
-        echo Debug: Looking for test file !mem_file!
+        echo Debug: Looking for test file: !mem_file!
         
         if not exist "!mem_file!" (
-            echo Error: Test file not found
+            echo Error: Test file not found at: !mem_file!
             exit /b 1
         )
         
