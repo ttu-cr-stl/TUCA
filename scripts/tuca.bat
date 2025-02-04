@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 REM Get the directory where this script is located
 set "SCRIPT_DIR=%~dp0"
-set "ROOT_DIR=%SCRIPT_DIR%\.."
+set "ROOT_DIR=%SCRIPT_DIR%.."
 
 REM Change to root directory
 cd /d "%ROOT_DIR%"
@@ -22,7 +22,7 @@ if "%1"=="emu" (
     if "%4"=="--verbose" set "verbose=true"
     if "%3"=="--verbose" set "verbose=true"
     
-    REM Setup paths
+    REM Setup paths (using proper Windows path separators)
     set "prog_dir=%ROOT_DIR%\Programs\%program_dir%"
     set "prog_file=!prog_dir!\prog.txt"
     
@@ -30,26 +30,26 @@ if "%1"=="emu" (
     
     REM Check if program exists
     if not exist "!prog_dir!" (
-        echo Error: Program directory !prog_dir! not found
+        echo Error: Program Directory not found
         exit /b 1
     )
     
     REM Check if program file exists
     if not exist "!prog_file!" (
-        echo Error: Program file !prog_file! not found
+        echo Error: Program file not found
         exit /b 1
     )
     
     REM If no test specified, test is "all", or only --verbose flag, run all tests from config
     if "%test_name%"=="" (
         python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" %4
-        exit /b %ERRORLEVEL%
+        exit /b !ERRORLEVEL!
     ) else if "%test_name%"=="--verbose" (
         python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" --verbose
-        exit /b %ERRORLEVEL%
+        exit /b !ERRORLEVEL!
     ) else if "%test_name%"=="all" (
         python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" %4
-        exit /b %ERRORLEVEL%
+        exit /b !ERRORLEVEL!
     ) else (
         REM Run specific test
         set "mem_file=!prog_dir!\test_mems\%test_name%.txt"
@@ -58,7 +58,7 @@ if "%1"=="emu" (
         echo Debug: Looking for test file !mem_file!
         
         if not exist "!mem_file!" (
-            echo Error: Test file !mem_file! not found
+            echo Error: Test file not found
             exit /b 1
         )
         
@@ -70,7 +70,7 @@ if "%1"=="emu" (
         ) else (
             python "!ROOT_DIR!\Pipeline\Emulator\src\run.py" "!prog_file!" "!mem_file!" "!output_file!"
         )
-        exit /b %ERRORLEVEL%
+        exit /b !ERRORLEVEL!
     )
 )
 
