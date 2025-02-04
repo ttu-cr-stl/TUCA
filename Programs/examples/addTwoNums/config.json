@@ -1,0 +1,35 @@
+{
+  "program": "prog.txt",
+  "test_cases": [
+    {
+      "name": "test1",
+      "description": "Basic addition: 5 + 3 = 8",
+      "memory": "test_mems/test1.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x08"
+        }
+      }
+    },
+    {
+      "name": "test2",
+      "description": "Adding zero: 7 + 0 = 7",
+      "memory": "test_mems/test2.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x07"
+        }
+      }
+    },
+    {
+      "name": "test3",
+      "description": "Max value test: 255 + 1 = 0 (overflow)",
+      "memory": "test_mems/test3.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x00"
+        }
+      }
+    }
+  ]
+}

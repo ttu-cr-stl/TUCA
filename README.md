@@ -199,8 +199,8 @@ TUCA/
 │       ├── prog.txt      # Assembly program
 │       ├── config.json   # Test configuration
 │       ├── test_mems/    # Test memory files
-│       │   ├── test1.txt
-│       │   └── test2.txt
+│       │   ├── test1.txt # Initial memory state for test1
+│       │   └── test2.txt # Initial memory state for test2
 │       ├── build/        # Build artifacts
 │       │   └── prog.mem      # Compiled program
 │       └── results/      # Test results
@@ -218,58 +218,111 @@ TUCA/
     └── tuca         # Command-line interface
 ```
 
+### Test Memory Files
+
+Test memory files (`test_mems/*.txt`) specify the initial state of memory for each test case. Each line in the file represents a sequential memory location starting from address 0x00. The format is:
+
+- Values must be in hexadecimal format with `0x` prefix (e.g., `0xFF`)
+- Values must come first in the file, before any comments
+- Comments (starting with `#`) and empty lines are only allowed after all memory values
+- Each non-comment line represents the next sequential memory location
+
+Example test memory file (`test1.txt`):
+
+```
+0x05    # This will be at memory[0x00]
+0x03    # This will be at memory[0x01]
+# This is a test case that adds 5 + 3
+```
+
+This would initialize:
+
+- `memory[0x00] = 0x05`
+- `memory[0x01] = 0x03`
+
+❗ Important: Comments and empty lines at the beginning of the file will be counted as memory locations with value 0x00. Always put memory values first, then comments.
+
+### Test Configuration
+
+The `config.json` file specifies test cases and their expected results:
+
+```json
+{
+  "program": "prog.txt",
+  "test_cases": [
+    {
+      "name": "test1",
+      "description": "Add two numbers: 5 + 3 = 8",
+      "memory": "test_mems/test1.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x08"
+        }
+      }
+    }
+  ]
+}
+```
+
+Each test case:
+
+- Loads initial memory state from a test memory file
+- Runs the program
+- Verifies memory contents match expected values
+
 ## Quick Start
 
 1. **Create a New Program**:
 
    Create a new directory for your program with this structure:
 
-   ```
-   Programs/
-   └── example1/           # Your program directory
-       ├── prog.txt        # Your assembly program
-       ├── config.json     # Test configuration
-       └── test_mems/      # Test memory files
-           └── test1.txt   # Initial memory state
-   ```
+```
+Programs/
+└── example1/ # Your program directory
+├── prog.txt # Your assembly program
+├── config.json # Test configuration
+└── test_mems/ # Test memory files
+└── test1.txt # Initial memory state
 
-   You can create this structure:
+```
 
-   - Using your file explorer
-   - Using command line:
+You can create this structure:
 
-     ```bash
-     # Linux/macOS
-     mkdir -p Programs/example1/test_mems
+- Using your file explorer
+- Using command line:
 
-     # Windows (CMD)
-     mkdir Programs\example1\test_mems
-     ```
+  ```bash
+  # Linux/macOS
+  mkdir -p Programs/example1/test_mems
+
+  # Windows (CMD)
+  mkdir Programs\example1\test_mems
+  ```
 
 2. **Write Your Program**:
 
-   Create `Programs/example1/prog.txt` using any text editor and write your TUCA assembly code.
+Create `Programs/example1/prog.txt` using any text editor and write your TUCA assembly code.
 
 3. **Configure Tests**:
 
-   Create `Programs/example1/config.json`:
+Create `Programs/example1/config.json`:
 
-   ```json
-   {
-     "program": "prog.txt",
-     "test_cases": [
-       {
-         "name": "test1",
-         "memory": "test_mems/test1.txt",
-         "expected": {
-           "memory": {
-             "0x02": "0x10"
-           }
-         }
-       }
-     ]
-   }
-   ```
+```json
+{
+  "program": "prog.txt",
+  "test_cases": [
+    {
+      "name": "test1",
+      "memory": "test_mems/test1.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x10"
+        }
+      }
+    }
+  ]
+}
+```
 
 4. **Build and Test**:
 
@@ -339,21 +392,23 @@ The emulator has two operating modes:
 
 1. **Minimal Mode** (Default):
 
-   - Shows final memory map
+   - Shows final memory map (only non-zero locations)
    - Shows verification result (✅ or ❌)
    - Perfect for automated testing and quick checks
 
 2. **Verbose Mode** (with --verbose):
    - Shows full instruction execution trace
    - Shows register state after each instruction
-   - Shows final memory map
+   - Shows final memory map (only non-zero locations)
    - Perfect for debugging and understanding program flow
 
 Both modes will display:
 
-- The final memory map showing all non-zero memory locations
+- The final memory map showing only non-zero memory locations
 - Test verification results when running against test cases
 - Any errors or issues encountered during execution
+
+Note: Memory locations containing 0x00 are not displayed in the final memory map to reduce clutter. This does not mean they don't exist - they are still part of the program's memory state.
 
 ### Verifying Results
 

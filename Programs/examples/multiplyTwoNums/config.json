@@ -1,0 +1,45 @@
+{
+  "program": "prog.txt",
+  "test_cases": [
+    {
+      "name": "test1",
+      "description": "Basic multiplication: 5 x 3 = 15",
+      "memory": "test_mems/test1.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x0F"
+        }
+      }
+    },
+    {
+      "name": "test2",
+      "description": "Multiply by zero: 7 x 0 = 7 (first iteration)",
+      "memory": "test_mems/test2.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x07"
+        }
+      }
+    },
+    {
+      "name": "test3",
+      "description": "Multiply by one: 9 x 1 = 9",
+      "memory": "test_mems/test3.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x09"
+        }
+      }
+    },
+    {
+      "name": "test4",
+      "description": "Large numbers: 16 x 16 = 256 (overflow)",
+      "memory": "test_mems/test4.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x00"
+        }
+      }
+    }
+  ]
+}

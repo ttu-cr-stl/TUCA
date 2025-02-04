@@ -15,6 +15,7 @@ class TUCAEmulator:
         """Reset all registers and memory to initial state"""
         self.reg = [0] * 16  # 16 registers, 8 bits each
         self.mem = [0] * 256  # 256 memory locations, 8 bits each
+        self.initialized_mem = set()  # Track which memory locations were initialized
         self.prog_idx = 0    # Program counter (multiply by 2 for byte address)
         self.instructions = []  # List of instructions
         self.labels = {}     # Dictionary of label positions
@@ -86,6 +87,7 @@ class TUCAEmulator:
             with open(memory_file, 'r') as mem_file:
                 # Reset memory
                 self.mem = [0] * 256
+                self.initialized_mem = set()
                 
                 # Read the initial memory map values into the memory array
                 for idx, line in enumerate(mem_file):
@@ -106,6 +108,7 @@ class TUCAEmulator:
                             raise ValueError(f"Memory value {value} exceeds 8 bits")
                             
                         self.mem[idx] = value
+                        self.initialized_mem.add(idx)  # Track that this location was initialized
                     except ValueError as e:
                         print(f"Warning: Invalid memory value on line {idx+1}: {line}")
                         print(f"Error: {str(e)}")
@@ -324,13 +327,13 @@ class TUCAEmulator:
                         print(f"{idx:02d}: 0x{val:02x}")
                 print("\nFinal Memory State:")
                 for idx, val in enumerate(self.mem):
-                    if val != 0:  # Only show non-zero values
+                    if val != 0 or idx in self.initialized_mem:  # Show non-zero values and initialized locations
                         print(f"0x{idx:02x}: 0x{val:02x}")
             
             # Added: Convert memory array to dict for return value
             memory_dict = {
                 idx: val for idx, val in enumerate(self.mem)
-                if val != 0  # Only include non-zero values
+                if val != 0 or idx in self.initialized_mem  # Include non-zero values and initialized locations
             }
             
             # Added: Return final state for testing

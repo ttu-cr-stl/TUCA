@@ -1,0 +1,45 @@
+{
+  "program": "prog.txt",
+  "test_cases": [
+    {
+      "name": "test1",
+      "description": "First number larger: 8 > 3",
+      "memory": "test_mems/test1.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x08"
+        }
+      }
+    },
+    {
+      "name": "test2",
+      "description": "Second number larger: 4 < 7",
+      "memory": "test_mems/test2.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x07"
+        }
+      }
+    },
+    {
+      "name": "test3",
+      "description": "Equal numbers: 5 = 5",
+      "memory": "test_mems/test3.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x05"
+        }
+      }
+    },
+    {
+      "name": "test4",
+      "description": "Compare with zero: 0 < 9",
+      "memory": "test_mems/test4.txt",
+      "expected": {
+        "memory": {
+          "0x02": "0x09"
+        }
+      }
+    }
+  ]
+}

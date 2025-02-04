@@ -1,0 +1,32 @@
+# Program to compare two 8-bit numbers and store the largest
+# By Juan Carlos Rojas
+#
+# The operands are read from memory locations:
+#   0x00    first_number 
+#   0x01    second_number
+# The result will be placed in memory at:
+#   0x02    result
+
+# Variables
+def src1 0x00
+def src2 0x01
+def dst 0x02
+
+# Read the first two operands into r0 and r1
+ld src1 r0
+ld src2 r1
+
+# Compare
+gt r0 r1 r2
+
+# If the first number was larger (r2==1), don´t do anything
+skipif r2
+
+# If the second number was larger, copy it into r0
+ld src2 r0
+
+# Store what is in r0 onto destination
+st r0 dst
+
+# All done
+halt
