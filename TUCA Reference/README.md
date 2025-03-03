@@ -63,6 +63,54 @@ It also has an instruction memory of up to 4096 bytes, with a fixed-length encod
 | `loadpc reg_hi reg_lo` | Saves the contents of the current program counter (PC) into registers `reg_hi` & `reg_lo`. The PC is a 12-bit address, whose most significant 4 bits will be stored in `reg_hi`, and the least significant 8 bits in `reg_lo`                                            |
 | `halt`                 | Terminates the program                                                                                                                                                                                                                                                   |
 
+## TUCA 5.1 vs x86 Architecture Comparison
+
+TUCA 5.1 is a simplified architecture designed for educational purposes, which differs significantly from the x86 architecture commonly found in modern computers. Understanding these differences can help those familiar with x86 assembly transition to TUCA 5.1 more easily.
+
+### Key Differences
+
+| Feature            | TUCA 5.1                                           | x86                                                                                 |
+| ------------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Word Size          | 8-bit architecture                                 | 32/64-bit architecture (modern x86)                                                 |
+| Memory Model       | 256-byte data memory with addresses from 0 to 0xFF | Complex memory model with segmentation, paging, and gigabytes of addressable memory |
+| Registers          | 16 general-purpose registers (r0-r15)              | Various specialized registers (EAX, EBX, ECX, EDX, ESI, EDI, ESP, EBP, etc.)        |
+| Instruction Length | Fixed 2-byte encoding                              | Variable-length encoding (1-15 bytes)                                               |
+| Instruction Set    | Simple, reduced instruction set                    | Complex instruction set with hundreds of instructions                               |
+| Addressing Modes   | Limited addressing modes                           | Many addressing modes                                                               |
+
+### Instruction Set Differences
+
+1. **No direct MOV instruction**:
+
+   - TUCA uses `ld`, `ldi`, `st` instead of x86's `mov` instruction
+   - Example: x86 `mov eax, ebx` would be `ld reg1 reg2` in TUCA
+
+2. **Arithmetic Operations**:
+
+   - TUCA requires three operands for arithmetic operations (e.g., `add reg1 reg2 reg3`)
+   - x86 typically uses two operands with one being both source and destination (e.g., `add eax, ebx`)
+
+3. **Branching and Jumps**:
+
+   - TUCA has simpler conditional execution with `if` and `skipif`
+   - x86 has many conditional jumps (JE, JNE, JG, JGE, etc.)
+
+4. **No Stack Instructions**:
+
+   - TUCA doesn't have built-in stack operations like x86's `push`, `pop`, `call`, and `ret`
+   - Function calls in TUCA must be manually implemented using jumps and register saving
+
+5. **No Floating-Point Support**:
+
+   - TUCA has no floating-point instructions
+   - x86 has extensive floating-point support through x87 FPU, SSE, AVX, etc.
+
+6. **Simpler Interrupt Handling**:
+   - TUCA has minimal or no interrupt handling
+   - x86 has complex interrupt and exception handling mechanisms
+
+This comparison highlights that TUCA 5.1 is designed as a teaching architecture that simplifies many concepts found in commercial architectures like x86. These simplifications make it easier to understand fundamental computer architecture concepts without the complexity of modern processors.
+
 ## Comments and Whitespace
 
 - Any line beginning with the "#" character will be considered a comment line and ignored
